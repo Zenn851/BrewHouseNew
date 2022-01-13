@@ -2,31 +2,42 @@ import ttkbootstrap as ttk
 import sys
 
 ###Create Radio Buttons
-def radioCreate(dict,frame,xpos,ypos):
-    v = ttk.IntVar()
-    v.set(1)  # initializing the choice, i.e. Python
+class RadioCreate:
+    """
+    Create a Radio Button class
+    """
+    def __init__(self,name):
+        self.name = name
 
-    languages = dict
+    def radioCreate(dict,frame,xpos,ypos):
+        v = ttk.IntVar()
+        v.set(1)  # initializing the choice, i.e. Python
 
-    def ShowChoice():
-        print(v.get())
-    x1 = xpos
-    y1 = ypos
-    for language, val in languages:
-        y1+= 30
+        languages = dict
 
-        ttk.Radiobutton(frame,
-                      text=language,
-                      bootstyle ='danger-toolbutton',
-                      width = 20,
-                      #padx = 20,
-                      variable=v,
-                      command=[],
-                      value=val).place(x=x1,y=y1, anchor='n')
+        def ShowChoice():
+            print(v.get())
+        x1 = xpos
+        y1 = ypos
+        for language, val in languages:
+            y1+= 30
+
+            ttk.Radiobutton(frame,
+                          text=language,
+                          bootstyle ='danger-toolbutton',
+                          width = 20,
+                          #padx = 20,
+                          variable=v,
+                          command=ShowChoice,
+                          value=val).place(x=x1,y=y1, anchor='n')
 
 
 
-class PrintLogger(): # create file like object
+
+class PrintLogger: # create file like object
+    """
+    A class to take the output of the terminal window and display it in the GUI
+    """
     def __init__(self, textbox): # pass reference to text widget
         self.textbox = textbox # keep ref
 

@@ -6,6 +6,9 @@ import TTKfunctions as fun
 import BrewHouseClassDefinitions as bh
 import sys
 
+
+
+
 temp = 0
 setTemp = 0
 
@@ -41,9 +44,6 @@ notebook.add(frame3, text='Serving Tanks')
 ####BREW HOUSE#############################
 ###########################################
 
-# hltLabel = ttk.Label(frame1, text="HLT TEMPERATURE:  "+str(temp)+ u"\N{DEGREE SIGN}" + "F")
-# hltLabel.pack(pady=5)
-#
 
 output = ScrolledText()
 output.place(x = 10, rely = 1.0, height = 50,width = 780, anchor ='sw')
@@ -81,11 +81,8 @@ ping_meter1 = ttk.Meter(
 ping_meter1.place(relx=.5,rely=0, anchor='n')
 
 
-someDict = [("ON", 101),
-         ("OFF", 102),
-             ("BOIL", 103)
-             ]
-fun.radioCreate(someDict,frame1,400,180)
+someDict = [("AUTO", 100), ("MANUAL", 101), ("OFF", 102)]
+fun.RadioCreate.radioCreate(someDict,frame1,400,180)
 
 ping_meter2 = ttk.Meter(
     master=frame1,
@@ -128,26 +125,20 @@ def update():
     temp = str(randint(0,212))
     #hltLabel["text"] = "HLT TEMPERATURE:  "+str(temp)+ u"\N{DEGREE SIGN}" + "F"
     ping_meter.configure(amountused = temp)
+    tank88.temperature = temp
     root.after(1000,update)
+    #print(tank88.temperature)
+
 
 ###########################################
 ####Fermentation#############################
 ###########################################
-ping_meter22 = ttk.Meter(
-    master=frame2,
-    metersize= 180,
-    padding = 20,
-    amountused=40,
-    textright='°F',
-    amounttotal=212,
-    metertype='semi',
-    subtext='F-TANK #1',
-    bootstyle='primary',
-    interactive=False
-)
-ping_meter22.place(x=0,y=0, anchor='nw')
-myButton6 = ttk.Button(frame2, text="CRASH", bootstyle="info-outline-toolbutton")
-myButton6.place(x=110, y=180, anchor = 'n')
+tank88 = bh.Fermentation("Tank1")
+tank88.meterCreate(frame2,x=200,y=200,a='w')
+
+
+
+
 ###########################################
 ####ServingTanks#############################
 ###########################################
@@ -172,6 +163,9 @@ def tankCreator(tanks):
         tank.place(x=xpos,y=ypos, anchor='nw')
         xpos += 200
 tankCreator(tanks)
+
+
+
 
 ########################################################
 update()

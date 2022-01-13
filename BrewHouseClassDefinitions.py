@@ -1,16 +1,22 @@
 from datetime import datetime
+import time
+import matplotlib.pyplot as plt
+from simple_pid import PID
+import ttkbootstrap as ttk
 
 
 ##############################
 ##############################
 ##############################
 class Fermentation:
-
-    ###Add all the parameters for the Class
+    """
+    Simple simulation of a water boiler which can heat up water
+    and where the heat dissipates slowly over time
+    """
     def __init__(self,name):
         self.name = name
-        self.tempurature = None
-        self.setTemperature = 40
+        self.temperature = None
+        self.setTemperature = None
         self.valveState = False
 
     ###Set the historesist that the tanks can be at with hist
@@ -29,12 +35,35 @@ class Fermentation:
     def alwaysOff(self):
         self.valveState = False
 
+    ####GUI Object Creator
+    def meterCreate(self,frame,x,y,a):
+            ttk.Meter(
+                master=frame,
+                metersize= 180,
+                padding = 20,
+                amountused= self.temperature,
+                textright='°F',
+                amounttotal= 80,
+                metertype='semi',
+                subtext=self.name,
+                bootstyle='primary',
+                interactive=False).place(x=x, y=y, anchor = str(a))
+            ttk.Button(
+                frame,
+                text="CRASH",
+                bootstyle="info-outline-toolbutton").place(
+                x=(x+110),
+                y=(y+90),
+                anchor = 'n')
+
 ##############################
 ##############################
 ##############################
 class ServingTank:
-
-    ###Add all the parameters for the Class
+    """
+    Simple simulation of a water boiler which can heat up water
+    and where the heat dissipates slowly over time
+    """
     def __init__(self,name):
         self.name = name
         self.tempurature = None
@@ -62,8 +91,10 @@ class ServingTank:
 ##############################
 ##############################
 class Brewhouse:
-
-    ####Enter all the parameters for the class
+    """
+    Simple simulation of a water boiler which can heat up water
+    and where the heat dissipates slowly over time
+    """
     def __init__(self,name):
 
         self.name = name
@@ -83,6 +114,7 @@ class Brewhouse:
 
         self.exchangeTemp = None
 
+
         ###Tuple assumes first variable is on/off, second is DutyCycle
         ###Possible we could just set DC to 0
         self.mainPump = (False, 0)
@@ -92,13 +124,16 @@ class Brewhouse:
         self.spargePump = (False, 0)
 
 
-    def mainPumpOn(self, power = 50):
+    def mainPumpOn(self, power=50):
         if power < 0 or power >100:
             tprint("Please Enter a Value between 0 and 100")
 
         else:
             self.mainPump = (True, power)
             tprint("Main Pump Turned on "+str(power)+"% Power")
+
+
+
 
     def spargePumpOn(self, power = 50):
         if power < 0 or power >100:
@@ -163,3 +198,68 @@ class Brewhouse:
 def tprint(*args):
     stamp = str(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
     print(str(*args) + " : "+stamp)
+
+
+
+
+
+
+
+##############
+###Example of using the PID control
+######################################
+if __name__ == '__main__':
+
+    class WaterBoiler:
+        """
+        Simple simulation of a water boiler which can heat up water
+        and where the heat dissipates slowly over time
+        """
+
+        def __init__(self):
+            self.water_temp = 20
+
+        def update(self, boiler_power, dt):
+            if boiler_power > 0:
+                # Boiler can only produce heat, not cold
+                self.water_temp += 1 * boiler_power * dt
+
+            # Some heat dissipation
+            self.water_temp -= 1 * dt
+            return self.water_temp
+
+    boiler = WaterBoiler()
+    water_temp = boiler.water_temp
+
+    pid = PID(1, 0.01, 0.1, setpoint=water_temp)
+    pid.output_limits = (0, 100)
+
+    start_time = time.time()
+    last_time = start_time
+
+
+    # Keep track of values for plotting
+    setpoint, y, x = [], [], []
+
+    while time.time() - start_time < 10:
+        current_time = time.time()
+        dt = current_time - last_time
+
+        power = pid(water_temp)
+        print(power)
+        time.sleep(.1)
+        water_temp = boiler.update(power, dt)
+
+        x += [current_time - start_time]
+        y += [water_temp]
+        setpoint += [pid.setpoint]
+
+        pid.setpoint = 50
+        last_time = current_time
+
+    plt.plot(x, y, label='measured')
+    plt.plot(x, setpoint, label='target')
+    plt.xlabel('time')
+    plt.ylabel('temperature')
+    plt.legend()
+    plt.show()
