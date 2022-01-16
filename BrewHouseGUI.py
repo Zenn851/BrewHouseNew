@@ -4,22 +4,17 @@ from random import randint
 from tkinter.scrolledtext import ScrolledText
 import TTKfunctions as fun
 import BrewHouseClassDefinitions as bh
+from BrewHouseClassDefinitions import tprint
 import sys
-
-
-
 
 temp = 0
 setTemp = 0
 
-print("h")
 
 # root window
 root = ttk.Window("Brew", "superhero",resizable=(False, False))
 frame = ttk.Frame()
-
 root.geometry('800x600')
-
 
 # create a notebook
 notebook = ttk.Notebook(root)
@@ -44,59 +39,18 @@ notebook.add(frame3, text='Serving Tanks')
 ####BREW HOUSE#############################
 ###########################################
 
+brewery1 = bh.Brewhouse('Brew House 1')
+brewery1.meterCreate(frame1)
 
-output = ScrolledText()
-output.place(x = 10, rely = 1.0, height = 50,width = 780, anchor ='sw')
-pl = fun.PrintLogger(output)
-sys.stdout=pl
+brewery1.hltMeter.place(x=0,y=0, anchor='nw')
+brewery1.bkMeter.place(relx=.5,rely=0, anchor='n')
+brewery1.mashMeter.place(relx=1,y=0, anchor='ne')
 
-
-ping_meter = ttk.Meter(
-    master=frame1,
-    metersize= 180,
-    padding = 20,
-    amountused=temp,
-    textright='°F',
-    amounttotal=212,
-    metertype='semi',
-    subtext='HLT Temperature',
-    bootstyle='danger',
-    interactive=False
-)
-ping_meter.place(x=0,y=0, anchor='nw')
-
-
-ping_meter1 = ttk.Meter(
-    master=frame1,
-    metersize= 180,
-    padding=20,
-    amountused=50,
-    textright='°F',
-    amounttotal=180,
-    metertype='semi',
-    subtext='Brew Kettle',
-    bootstyle='danger',
-    interactive=True
-)
-ping_meter1.place(relx=.5,rely=0, anchor='n')
-
-
-someDict = [("AUTO", 100), ("MANUAL", 101), ("OFF", 102)]
-fun.RadioCreate.radioCreate(someDict,frame1,400,180)
-
-ping_meter2 = ttk.Meter(
-    master=frame1,
-    metersize= 180,
-    padding=20,
-    amountused=50,
-    textright='°F',
-    amounttotal=180,
-    metertype='semi',
-    subtext='MASH',
-    bootstyle='danger',
-    interactive=False
-)
-ping_meter2.place(relx=1,y=0, anchor='ne')
+someDict = [("AUTO", 100), ("MAN", 101), ("OFF", 102)]
+fun.RadioCreate.radioCreate(someDict,frame1,250,190)
+brewery1.hltsetTempPlusButton.place(x=470,y=240, anchor ='w')
+brewery1.hltsetTempLabel.place(x=350,y=240, anchor ='w')
+brewery1.hltsetTempMinusButton.place(x=310,y=240, anchor ='w')
 
 sethltLabel = ttk.Label(frame1, text="HLT SET TEMPERATURE:   " +str(setTemp)+ u"\N{DEGREE SIGN}" + "F")
 sethltLabel.place(x=110, y =180, anchor = 'n')
@@ -112,62 +66,59 @@ e.insert(0,"")
 def myClick():
     setTemp = str(e.get())
     sethltLabel["text"] = "HLT SET TEMPERATURE:  " + str(setTemp) + u"\N{DEGREE SIGN}" + "F"
-    print("GPIO 1 Toggle")
+    tprint("HLT SET TEMPERATURE   " +str(setTemp)+ u"\N{DEGREE SIGN}" + "F")
 
 myButton = ttk.Button(frame1, text="Enter HLT Temperature", bootstyle="info-outline-toolbutton", command=myClick)
 myButton.place(x=110, y=235, anchor = 'n')
 
 
-################################################################
-#################################################################
-def update():
-    # random number gernating for debuggin.  Set Temp = Thermister
-    temp = str(randint(0,212))
-    #hltLabel["text"] = "HLT TEMPERATURE:  "+str(temp)+ u"\N{DEGREE SIGN}" + "F"
-    ping_meter.configure(amountused = temp)
-    tank88.temperature = temp
-    root.after(1000,update)
-    #print(tank88.temperature)
-
 
 ###########################################
 ####Fermentation#############################
 ###########################################
-tank88 = bh.Fermentation("Tank1")
-tank88.meterCreate(frame2,x=200,y=200,a='w')
 
-
-
+tank88 = bh.Fermentation('Tank 1',frame2)
+tank88.fermMeter.place(x=0,y=0,anchor='nw')
+tank88.crashButton.place(x=110,y=160,anchor='n')
+tank88.onButton.place(x=110,y=200,anchor='n')
+tank88.offButton.place(x=110,y=240,anchor='n')
 
 ###########################################
 ####ServingTanks#############################
 ###########################################
 tanks=['tank1','tank2','tank3','tank4']
 
-def tankCreator(tanks):
-    xpos = 0
-    ypos = 0
-    for i in tanks:
-        tank = ttk.Meter(
-            master=frame3,
-            metersize= 180,
-            padding = 20,
-            amountused=40,
-            textright='°F',
-            amounttotal=212,
-            metertype='semi',
-            subtext=str(i),
-            bootstyle='primary',
-            interactive=False
-        )
-        tank.place(x=xpos,y=ypos, anchor='nw')
-        xpos += 200
-tankCreator(tanks)
+tank3 = bh.ServingTank('S-Tank 1')
+tank3.meterCreate(frame3)
+tank3.fermMeter.place(x=0,y=0,anchor='nw')
+tank3.crashButton.place(x=110,y=160,anchor='n')
 
 
+
+##############Debug Window###################
+output = ScrolledText()
+output.place(x = 10, rely = 1.0, height = 50,width = 780, anchor ='sw')
+pl = fun.PrintLogger(output)
+sys.stdout=pl
+
+################################################
+####   MAIN LOOP  ##############################
+
+
+def update():
+    # random number gernating for debuggin.  Set Temp = Thermister
+    temp = str(randint(0,212))
+    ### Brew House Updates########
+    brewery1.hltMeter.configure(amountused = temp)
+    brewery1.bkMeter.configure(amountused = temp)
+    brewery1.mashMeter.configure(amountused = temp)
+
+    tank88.fermMeter.configure(amountused = temp)
+    tank3.fermMeter.configure(amountused = temp)
+
+    root.after(1000,update)
 
 
 ########################################################
 update()
-
 root.mainloop()

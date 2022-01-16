@@ -20,16 +20,15 @@ class RadioCreate:
         x1 = xpos
         y1 = ypos
         for language, val in languages:
-            y1+= 30
+            x1+= 62
 
             ttk.Radiobutton(frame,
                           text=language,
                           bootstyle ='danger-toolbutton',
-                          width = 20,
+                          width = 6,
                           #padx = 20,
                           variable=v,
-                          command=ShowChoice,
-                          value=val).place(x=x1,y=y1, anchor='n')
+                          command=ShowChoice, value=val).place(x=x1,y=y1, anchor='w')
 
 
 
