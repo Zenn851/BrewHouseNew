@@ -16,15 +16,15 @@ class Fermentation:
     def __init__(self,name,frame):
 
         self.name = name
-        self.temperature = None
-        self.setTemperature = None
+        self.temp = None
+        self.setTemp = None
         self.valveState = False
 
         self.fermMeter = ttk.Meter(
                             master=frame,
                             metersize=180,
                             padding = 20,
-                            amountused= self.temperature,
+                            amountused= self.temp,
                             textright='°F',
                             amounttotal= 80,
                             metertype='semi',
@@ -48,10 +48,10 @@ class Fermentation:
                             command = self.alwaysOff)
     ###Set the historesist that the tanks can be at with hist
     def pid_loop(self):
-        if self.temperature or self.setTemperature == None:
+        if self.temp or self.setTemp == None:
             tprint(str(self.name) + "  Temperature or Set Temperature not set properly")
             pass
-        elif abs(self.temperature - self.setTemperature)>3:
+        elif abs(self.temp - self.setTemp)>3:
             self.valveState = True
         else:
             self.valveState = False
@@ -67,59 +67,6 @@ class Fermentation:
         tprint(str(self.name) + "  Tank Turned Off")
 
 
-
-##############################
-##############################
-##############################
-class ServingTank:
-    """
-    Simple simulation of a water boiler which can heat up water
-    and where the heat dissipates slowly over time
-    """
-    def __init__(self,name):
-        self.name = name
-        self.temperature = None
-        self.setTemperature = 40
-        self.valveState = False
-
-    ###Set the historesist that the tanks can be at with hist
-    def pid_loop(self,hist):
-
-        if abs(self.temperature - self.setTemperature)>hist:
-            self.valveState = True
-        else:
-            self.valveState = False
-
-    ####Call to keep the valve open
-    def crash(self):
-        self.valveState = True
-        tprint("Crash this mofo to start drinking")
-
-    ###Call to keep the valve closed
-    def alwaysOff(self):
-        self.valveState = False
-
-    ####GUI Object Creator
-    def meterCreate(self,frame,metersize=180):
-            self.fermMeter = ttk.Meter(
-                                master=frame,
-                                metersize=metersize,
-                                padding = 20,
-                                amountused= self.temperature,
-                                textright='°F',
-                                amounttotal= 80,
-                                metertype='semi',
-                                subtext=self.name,
-                                bootstyle='primary',
-                                interactive=False)
-            self.crashButton = ttk.Button(
-                                frame,
-                                text="CRASH",
-                                bootstyle="info-outline-toolbutton",
-                                command = self.crash)
-
-
-##############################
 ##############################
 ##############################
 class Brewhouse:
@@ -127,23 +74,23 @@ class Brewhouse:
     Simple simulation of a water boiler which can heat up water
     and where the heat dissipates slowly over time
     """
-    def __init__(self,name):
+    def __init__(self,name,frame):
 
         self.name = name
 
         self.hltTemp =   None
         self.hltSetTemp =   0
-        self.hltDutyCycle = None
+        self.hltDutyCycle = 0
         self.hltFloatSwLow = False
         self.hltFloatSwHi = False
         self.hltElement = False
 
-        self.brewKettleTemp =  None
-        self.brewKettleSetTemp = None
-        self.brewKettleDutyCycle = None
-        self.brewKettleFloatSwLow = False
-        self.brewKettleFloatSwHi = False
-        self.brewKettleElement = False
+        self.bkTemp =  None
+        self.bkSetTemp = 0
+        self.bkDutyCycle = 0
+        self.bkFloatSwLo = False
+        self.bkFloatSwHi = False
+        self.bkElement = False
 
         self.mashTemp = None
         self.mashSetTemp = None
@@ -159,6 +106,126 @@ class Brewhouse:
         ###Possible we could just set DC to 0
         self.spargePump = (False, 0)
 
+#############
+        self.hltMeter = ttk.Meter(
+                    master=frame,
+                    metersize= 180,
+                    padding = 10,
+                    amountused=self.hltTemp, ###########
+                    textright='°F',
+                    amounttotal=212,
+                    metertype='semi',
+                    subtext='HLT Temperature', ##############
+                    bootstyle='danger',
+                    interactive=False
+                    )
+        self.hltSetTempPlusButton = ttk.Button(frame,
+                                    text="+",
+                                    bootstyle="danger",
+                                    command= self.hltPlusTemp,
+                                    width = 3,
+                                    padding = 10)
+
+        self.hltSetTempMinusButton =ttk.Button(frame,
+                                    text="-",
+                                    bootstyle="danger",
+                                    command= self.hltMinusTemp,
+                                    width = 3,
+                                    padding = 10)
+
+        self.hltSetTempLabel =  ttk.Label(frame,
+                                bootstyle ="inverse-danger",
+                                text="SET TEMP:   " +str(self.hltSetTemp)+ u"\N{DEGREE SIGN}" + "F")
+
+        self.hltDutyPlusButton =ttk.Button(frame,
+                                    text="+",
+                                    bootstyle="danger",
+                                    command= self.hltPlusDutyCycle,
+                                    width = 3,
+                                    padding = 10)
+
+        self.hltDutyMinusButton =ttk.Button(frame,
+                                    text="-",
+                                    bootstyle="danger",
+                                    command= self.hltMinusDutyCylce,
+                                    width = 3,
+                                    padding = 10)
+
+        self.hltDutyLabel =     ttk.Label(frame,
+                                text="Duty Cycly:   "
+                                +str(self.hltDutyCycle)+"%")
+
+        self.bkMeter = ttk.Meter(
+                    master=frame,
+                    metersize= 180,
+                    padding = 10,
+                    amountused=self.bkTemp, ###########
+                    textright='°F',
+                    amounttotal=212,
+                    metertype='semi',
+                    subtext='Brew Kettle', ##############
+                    bootstyle='danger',
+                    interactive=False
+                    )
+        self.bkSetTempPlusButton = ttk.Button(frame,
+                                    text="+",
+                                    bootstyle="danger",
+                                    command= self.bkPlusTemp,
+                                    width = 3,
+                                    padding = 10
+                                    )
+
+        self.bkSetTempMinusButton =ttk.Button(frame,
+                                    text="-",
+                                    bootstyle="danger",
+                                    command= self.bkMinusTemp,
+                                    width = 3,
+                                    padding = 10
+                                    )
+
+        self.bkSetTempLabel =   ttk.Label(frame,
+                                text="SET TEMP:   "
+                                +str(self.bkSetTemp)+ u"\N{DEGREE SIGN}" + "F",
+                                width = 14,
+                                padding = 10,
+                                bootstyle ="inverse-danger"
+                                )
+
+        self.bkDutyPlusButton =ttk.Button(frame,
+                                    text="+",
+                                    bootstyle="danger",
+                                    width = 3,
+                                    padding = 10,
+                                    command= self.bkPlusDutyCycle)
+
+        self.bkDutyMinusButton =ttk.Button(frame,
+                                    text="-",
+                                    bootstyle="danger",
+                                    width = 3,
+                                    padding = 10,
+                                    command= self.bkMinusDutyCylce)
+
+        self.bkDutyLabel =      ttk.Label(frame,
+                                text="Duty Cycly:   "
+                                +str(self.bkDutyCycle)+"%")
+
+        self.mashMeter = ttk.Meter(
+                    master=frame,
+                    metersize= 180,
+                    padding = 10,
+                    amountused=self.mashTemp, ###########
+                    textright='°F',
+                    amounttotal=212,
+                    metertype='semi',
+                    subtext='Mash Ton', ##############
+                    bootstyle='danger',
+                    interactive=False
+                    )
+
+        self.setTempPlus =[]
+
+        self.setTempMinus =[]
+#########################
 
     def mainPumpOn(self, power=50):
         if power < 0 or power >100:
@@ -191,28 +258,28 @@ class Brewhouse:
         tprint("mash ton off")
 
     def boilDutyCycle(self, duty = 80):
-        if self.brewKettleFloatSw == True:
-            self.brewKettleElement = True
-            self.brewKettleDutyCycle = duty
+        if self.bkFloatSwHi == True:
+            self.bkeElement = True
+            self.bkDutyCycle = duty
             tprint("Brew Kettle on, Duty Cyle: "+ str(duty)+"%")
         else:
-            self.brewKettleElement = False
+            self.bkElement = False
             tprint("Water/Wort Needs to Fill")
 
     #######Set the DutyCyle of the element to 100%
     def boilOn(self):
-        if self.brewKettleFloatSw == True:
-            self.brewKettleElement = True
-            self.brewKettleDutyCycle = 100
+        if self.bkFloatSwHi == True:
+            self.bkeElement = True
+            self.bkDutyCycle = 100
             tprint("Brew Kettle on, Duty Cyle: 100%")
         else:
-            self.brewKettleElement = False
+            self.bkElement = False
             tprint("Water Needs to Fill")
 
     #######Set the DutyCyle of the element to 0%
     def boilOff(self):
-        self.brewKettleElement = False
-        self.brewKettleDutyCycle = 0
+        self.bkElement = False
+        self.bkDutyCycle = 0
         tprint("Brew Kettle Off, Duty Cyle: 0%")
 
     def hltOn(self, setTemp = 180):
@@ -228,97 +295,45 @@ class Brewhouse:
         self.hltSetTemp = 0
         tprint("HLT Turned Off")
 
-    def minusTemp(self):
+    def bkMinusTemp(self):
+        self.bkSetTemp -=1
+        tprint("Bew Kettle Temp minus 1")
+        self.bkSetTempLabel['text']="SET TEMP:   " +str(self.bkSetTemp)+ u"\N{DEGREE SIGN}" + "F"
+
+    def bkPlusTemp(self):
+        self.bkSetTemp +=1
+        tprint("Brew Kettle Temp Plus 1")
+        self.bkSetTempLabel['text']="SET TEMP:   " +str(self.bkSetTemp)+ u"\N{DEGREE SIGN}" + "F"
+
+    def hltMinusTemp(self):
         self.hltSetTemp -=1
-        tprint("Temp minus 1")
-        self.hltsetTempLabel['text']="SET TEMP:   " +str(self.hltSetTemp)+ u"\N{DEGREE SIGN}" + "F"
+        tprint("HLT Temp minus 1")
+        self.hltSetTempLabel['text']="SET TEMP:   " +str(self.hltSetTemp)+ u"\N{DEGREE SIGN}" + "F"
 
-    def plusTemp(self):
+    def hltPlusTemp(self):
         self.hltSetTemp +=1
-        tprint("Temp Plus 1")
-        self.hltsetTempLabel['text']="SET TEMP:   " +str(self.hltSetTemp)+ u"\N{DEGREE SIGN}" + "F"
+        tprint("HLT Temp Plus 1")
+        self.hltSetTempLabel['text']="SET TEMP:   " +str(self.hltSetTemp)+ u"\N{DEGREE SIGN}" + "F"
 
-    def meterCreate(self,frame):
+    def bkMinusDutyCylce(self):
+        self.bkDutyCycle -=1
+        tprint("Bew Kettle DutyCyle minus 1")
+        self.bkDutyLabel['text']="DutyCyle:   " +str(self.bkDutyCycle)+  "%"
 
-        self.hltMeter = ttk.Meter(
-                    master=frame,
-                    metersize= 180,
-                    padding = 20,
-                    amountused=self.hltTemp, ###########
-                    textright='°F',
-                    amounttotal=212,
-                    metertype='semi',
-                    subtext='HLT Temperature', ##############
-                    bootstyle='danger',
-                    interactive=False
-                    )
-        self.hltsetTempPlusButton = ttk.Button(frame,
-                                    text="+",
-                                    bootstyle="danger",
-                                    command= self.plusTemp)
+    def bkPlusDutyCycle(self):
+        self.bkDutyCycle +=1
+        tprint("Brew Kettle DutyCyle Plus 1")
+        self.bkDutyLabel['text']="DutyCyle:   " +str(self.bkDutyCycle)+  "%"
 
-        self.hltsetTempMinusButton =ttk.Button(frame,
-                                    text="-",
-                                    bootstyle="danger",
-                                    command= self.minusTemp)
+    def hltMinusDutyCylce(self):
+        self.hltDutyCycle -=1
+        tprint("HLT DutyCyle Plus 1%")
+        self.hltDutyLabel['text']="DutyCyle:   " +str(self.hltDutyCycle)+  "%"
 
-        self.hltsetTempLabel =  ttk.Label(frame,
-                                bootstyle ="inverse-danger",
-                                text="SET TEMP:   " +str(self.hltSetTemp)+ u"\N{DEGREE SIGN}" + "F")
-
-        self.hltDutyPlusButton =[]
-
-        self.hltDutyMinusButton =[]
-
-        self.hltDutyLabel =     ttk.Label(frame,
-                                text="Duty Cycly:   "
-                                +str(self.hltDutyCycle)+"%")
-
-        self.bkMeter = ttk.Meter(
-                    master=frame,
-                    metersize= 180,
-                    padding = 20,
-                    amountused=self.brewKettleTemp, ###########
-                    textright='°F',
-                    amounttotal=212,
-                    metertype='semi',
-                    subtext='Brew Kettle', ##############
-                    bootstyle='danger',
-                    interactive=False
-                    )
-        self.bksetTempPlusButton =[]
-
-        self.bksetTempMinusButton =[]
-
-        self.bksetTempLabel =   ttk.Label(frame,
-                                text="SET TEMPERATURE:   "
-                                +str(self.brewKettleSetTemp)+ u"\N{DEGREE SIGN}" + "F")
-
-        self.bkDutyPlusButton =[]
-
-        self.bkDutyMinusButton =[]
-
-        self.bkDutyLabel =      ttk.Label(frame,
-                                text="Duty Cycly:   "
-                                +str(self.brewKettleDutyCycle)+"%")
-
-        self.mashMeter = ttk.Meter(
-                    master=frame,
-                    metersize= 180,
-                    padding = 20,
-                    amountused=self.mashTemp, ###########
-                    textright='°F',
-                    amounttotal=212,
-                    metertype='semi',
-                    subtext='Mash Ton', ##############
-                    bootstyle='danger',
-                    interactive=False
-                    )
-
-        self.setTempPlus =[]
-
-        self.setTempMinus =[]
-
+    def hltPlusDutyCycle(self):
+        self.hltDutyCycle +=1
+        tprint("HLT DutyCyle Plus 1%")
+        self.hltDutyLabel['text']="DutyCyle:   " +str(self.hltDutyCycle)+  "%"
 
 
 def tprint(*args):

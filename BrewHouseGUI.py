@@ -39,8 +39,8 @@ notebook.add(frame3, text='Serving Tanks')
 ####BREW HOUSE#############################
 ###########################################
 
-brewery1 = bh.Brewhouse('Brew House 1')
-brewery1.meterCreate(frame1)
+brewery1 = bh.Brewhouse('Brew House 1',frame1)
+#brewery1.meterCreate(frame1)
 
 brewery1.hltMeter.place(x=0,y=0, anchor='nw')
 brewery1.bkMeter.place(relx=.5,rely=0, anchor='n')
@@ -48,50 +48,53 @@ brewery1.mashMeter.place(relx=1,y=0, anchor='ne')
 
 someDict = [("AUTO", 100), ("MAN", 101), ("OFF", 102)]
 fun.RadioCreate.radioCreate(someDict,frame1,250,190)
-brewery1.hltsetTempPlusButton.place(x=470,y=240, anchor ='w')
-brewery1.hltsetTempLabel.place(x=350,y=240, anchor ='w')
-brewery1.hltsetTempMinusButton.place(x=310,y=240, anchor ='w')
-
-sethltLabel = ttk.Label(frame1, text="HLT SET TEMPERATURE:   " +str(setTemp)+ u"\N{DEGREE SIGN}" + "F")
-sethltLabel.place(x=110, y =180, anchor = 'n')
 
 
+brewery1.bkSetTempMinusButton.place(x=290,y=210, anchor ='nw')
+brewery1.bkSetTempLabel.place(relx=.5,y=210, anchor ='n')
+brewery1.bkSetTempPlusButton.place(x=500,y=210, anchor ='ne')
 
+brewery1.bkDutyMinusButton.place(x=290,y=260, anchor ='nw')
+brewery1.bkDutyLabel.place(relx=.5,y=260, anchor ='n')
+brewery1.bkDutyPlusButton.place(x=500,y=260, anchor ='ne')
 
-e = ttk.Entry(frame1)
-e.place(x=110, y=200, anchor = 'n')
-e.get()
-e.insert(0,"")
-
-def myClick():
-    setTemp = str(e.get())
-    sethltLabel["text"] = "HLT SET TEMPERATURE:  " + str(setTemp) + u"\N{DEGREE SIGN}" + "F"
-    tprint("HLT SET TEMPERATURE   " +str(setTemp)+ u"\N{DEGREE SIGN}" + "F")
-
-myButton = ttk.Button(frame1, text="Enter HLT Temperature", bootstyle="info-outline-toolbutton", command=myClick)
-myButton.place(x=110, y=235, anchor = 'n')
+brewery1.hltSetTempMinusButton.place(x=20,y=210, anchor ='nw')
+brewery1.hltSetTempLabel.place(x=60, y =210, anchor = 'w')
+brewery1.hltSetTempPlusButton.place(x=180, y=210, anchor ='ne')
 
 
 
 ###########################################
-####Fermentation#############################
+####Fermentation/ServingTanks#############################
 ###########################################
+sTanks=['ST1','ST2','ST3','ST4','ST5', 'ST6', 'ST7']
+STANKS = []
+fTanks=['FT1','FT2','FT3','FT4']
+FTANKS = []
 
-tank88 = bh.Fermentation('Tank 1',frame2)
-tank88.fermMeter.place(x=0,y=0,anchor='nw')
-tank88.crashButton.place(x=110,y=160,anchor='n')
-tank88.onButton.place(x=110,y=200,anchor='n')
-tank88.offButton.place(x=110,y=240,anchor='n')
+def tankCreator(tanks1,frameNumber,TANKS):
+    xf = 0
+    yf = 0
+    count = 0
+    for i in tanks1:
+        if count <= 3:
+            pass
+        elif count >3:
+            count = 0
+            xf = 0
+            yf += 200
+            pass
+        i = bh.Fermentation(i,frameNumber)
+        i.fermMeter.place(x=xf,y=yf,anchor='nw')
+        i.crashButton.place(x=xf+110,y=yf+160,anchor='n')
+        i.onButton.place(x=xf+110,y=yf+200,anchor='n')
+        i.offButton.place(x=xf+110,y=yf+240,anchor='n')
+        xf += 195
+        TANKS.append(i)
+        count += 1
 
-###########################################
-####ServingTanks#############################
-###########################################
-tanks=['tank1','tank2','tank3','tank4']
-
-tank3 = bh.ServingTank('S-Tank 1')
-tank3.meterCreate(frame3)
-tank3.fermMeter.place(x=0,y=0,anchor='nw')
-tank3.crashButton.place(x=110,y=160,anchor='n')
+tankCreator(sTanks, frame3, STANKS)
+tankCreator(fTanks, frame2, FTANKS)
 
 
 
@@ -113,8 +116,8 @@ def update():
     brewery1.bkMeter.configure(amountused = temp)
     brewery1.mashMeter.configure(amountused = temp)
 
-    tank88.fermMeter.configure(amountused = temp)
-    tank3.fermMeter.configure(amountused = temp)
+    FTANKS[0].fermMeter.configure(amountused = temp)
+    STANKS[0].fermMeter.configure(amountused = temp)
 
     root.after(1000,update)
 
