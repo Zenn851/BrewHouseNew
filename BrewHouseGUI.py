@@ -31,7 +31,7 @@ frame2.pack(fill='both', expand=True)
 frame3.pack(fill='both', expand=True)
 # add frames to notebook
 
-notebook.add(frame1, text='Brew House')
+notebook.add(frame1, text='Brewhouse')
 notebook.add(frame2, text='Fermentation Tanks')
 notebook.add(frame3, text='Serving Tanks')
 
@@ -39,7 +39,7 @@ notebook.add(frame3, text='Serving Tanks')
 ####BREW HOUSE#############################
 ###########################################
 
-brewery1 = bh.Brewhouse('Brew House 1',frame1)
+brewery1 = bh.Brewhouse('Brewhouse 1',frame1)
 #brewery1.meterCreate(frame1)
 
 brewery1.hltMeter.place(x=0,y=0, anchor='nw')
@@ -67,7 +67,7 @@ brewery1.hltSetTempPlusButton.place(x=180, y=210, anchor ='ne')
 ###########################################
 ####Fermentation/ServingTanks#############################
 ###########################################
-sTanks=['ST1','ST2','ST3','ST4','ST5', 'ST6', 'ST7']
+sTanks=['ST1','ST2','ST3','ST4','ST5', 'ST6']
 STANKS = []
 fTanks=['FT1','FT2','FT3','FT4']
 FTANKS = []
@@ -119,7 +119,7 @@ def update():
     FTANKS[0].fermMeter.configure(amountused = temp)
     STANKS[0].fermMeter.configure(amountused = temp)
 
-    root.after(1000,update)
+    root.after(500,update)
 
 
 ########################################################

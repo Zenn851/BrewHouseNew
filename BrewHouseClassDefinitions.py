@@ -217,7 +217,7 @@ class Brewhouse:
                     textright='°F',
                     amounttotal=212,
                     metertype='semi',
-                    subtext='Mash Ton', ##############
+                    subtext='Mash Tun', ##############
                     bootstyle='danger',
                     interactive=False
                     )
@@ -248,14 +248,14 @@ class Brewhouse:
         if brewKettleFloatSw == True:
             self.mainPump = (True, 50)
             self.mashSetTemp = 155
-            tprint("Mashton Circulation on, set temperature: "+str(setTemp))
+            tprint("Mash tun Circulation on, set temperature: "+str(setTemp))
         else:
             tprint("Water Not at Temp to Circulate")
 
     def mashOff(self):
         self.mainPump = (False, 0)
         self.mashSetTemp = 155
-        tprint("mash ton off")
+        tprint("mash tun off")
 
     def boilDutyCycle(self, duty = 80):
         if self.bkFloatSwHi == True:
