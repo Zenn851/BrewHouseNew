@@ -6,6 +6,7 @@ import TTKfunctions as fun
 import BrewHouseClassDefinitions as bh
 from BrewHouseClassDefinitions import tprint
 import sys
+import ds18b20testing as DS18B20
 
 temp = 0
 setTemp = 0
@@ -111,12 +112,15 @@ sys.stdout=pl
 def update():
     # random number gernating for debuggin.  Set Temp = Thermister
     temp = str(randint(0,212))
+    
+    DS18B20_1 =DS18B20.read_temp(DS18B20.sensors[0]) #read temp sensor 
+    
     ### Brew House Updates########
     brewery1.hltMeter.configure(amountused = temp)
     brewery1.bkMeter.configure(amountused = temp)
     brewery1.mashMeter.configure(amountused = temp)
 
-    FTANKS[0].fermMeter.configure(amountused = temp)
+    FTANKS[0].fermMeter.configure(amountused = DS18B20_1)
     STANKS[0].fermMeter.configure(amountused = temp)
 
     root.after(500,update)

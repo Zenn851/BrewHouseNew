@@ -59,7 +59,7 @@ class Fermentation:
     ####Call to keep the valve open
     def crash(self):
         self.valveState = True
-        tprint(str(self.name) + "  Crash this mofo to start drinking")
+        tprint(str(self.name) + "  Crash this mofo to start drinking. Set temp:")
 
     ###Call to keep the valve closed
     def alwaysOff(self):
