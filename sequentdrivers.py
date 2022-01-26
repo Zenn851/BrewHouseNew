@@ -25,7 +25,7 @@ ST4_LED = 24
 ST5_LED = 25
 ST6_LED = 26
 
-
+DS18b20_1 = "28-0721705c2caa"
 
 GPIO.setmode(GPIO.BCM) # Use Broadcom numbers not Pi pin numbers
 #Set all float switches as pulldown inputs
@@ -176,19 +176,34 @@ def getHLTfloatLow():
 def getHLTfloatHigh():
     return GPIO.input(HLTfloatHigh)
 
-def FVTankOnTEST():
-    #RELAYS.set(3, 1, 1) for Sequent 8 relay board
-    GPIO.output(FV1, GPIO.HIGH)
+def FVTankOnTEST(j):
+    RELAYS.set(FV_board, j, 1) #for Sequent 8 relay board
+    print("tank on")
+    #GPIO.output(FV1, GPIO.HIGH)
 
-def FVTankOffTEST():
-    #RELAYS.set(3, 1, 0) for Sequent 8 relay board
-    GPIO.output(FV1, GPIO.LOW)
+def FVTankOffTEST(j):
+    RELAYS.set(FV_board, j, 0) #for Sequent 8 relay board
+    print("tank off")
+    #GPIO.output(FV1, GPIO.LOW)
     
+def testRelayBoard():
+    i = 1
+    while i <= 8:
+        FVTankOnTEST(i)
+        
+        time.sleep(.5)
+        
+        FVTankOffTEST(i)
+        
+        time.sleep(.5)
+        i += 1
+        
+def
 
 #TESTING BELOW THIS LINE
 
 
-while True:
+if __name__ == "__main__":
 
     #print(IO.getFwVer(2))
     #OUTPUTS.set(1, 1, 1)
@@ -209,10 +224,6 @@ while True:
 
     #stopHLTFill()
     #HLTSetoff()
+    print("Running")
     
-    print(getHLTfloatLow())
-
-
-    
-    time.sleep(1)
-    
+    #while True:
