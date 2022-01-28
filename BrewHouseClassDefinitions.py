@@ -3,22 +3,26 @@ import time
 import matplotlib.pyplot as plt
 from simple_pid import PID
 import ttkbootstrap as ttk
+from time import sleep, perf_counter
+import threading
 
 
 ##############################
 ##############################
 ##############################
-class Fermentation:
+class Fermentation(threading.Thread):
     """
     Simple simulation of a water boiler which can heat up water
     and where the heat dissipates slowly over time
     """
-    def __init__(self,name,frame):
-
+    def __init__(self,name,threadID,frame):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
         self.name = name
-        self.temp = None
-        self.setTemp = None
+        self.temp = 30
+        self.setTemp = 33
         self.valveState = False
+        self.mode = None
 
         self.fermMeter = ttk.Meter(
                             master=frame,
@@ -31,40 +35,82 @@ class Fermentation:
                             subtext=self.name,
                             bootstyle='primary',
                             interactive=False)
+
+
+        def nameCrash():
+            self.mode = "CRASH"
+            tprint(str(self.name) + "   Mode:" + str(self.mode))
         self.crashButton = ttk.Button(
                             frame,
                             text="CRASH",
                             bootstyle="info-outline-toolbutton",
-                            command = self.crash)
+                            command = nameCrash )
+        def namePID():
+            self.mode = "PID"
+            tprint(str(self.name) + "   Mode:" + str(self.mode))
         self.onButton = ttk.Button(
                             frame,
                             text="ON",
                             bootstyle="info-outline-toolbutton",
-                            command = self.pid_loop)
+                            command = namePID)
+        def nameOff():
+            self.mode = "OFF"
+            tprint(str(self.name) + "   Mode:" + str(self.mode))
         self.offButton = ttk.Button(
                             frame,
                             text="OFF",
                             bootstyle="info-outline-toolbutton",
-                            command = self.alwaysOff)
+                            command = nameOff)
+    def run(self):
+        print ("Starting Fermenation Class Running, ID:"  + self.name)
+        while True:
+
+            if self.mode == "PID":
+                if abs(self.temp - self.setTemp)>1:
+                    self.valveState = True
+                    tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
+                    sleep(2)
+                else:
+                    self.valveState = False
+                    sleep(2)
+
+            elif self.mode == "CRASH":
+                self.valveState = True
+                tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
+                sleep(2)
+
+            elif self.mode == "OFF":
+                self.valveState = False
+                tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
+                sleep(2)
+                print ("Exiting, ID:"  + self.name)
+            else:
+                sleep(2)
+                pass
+
     ###Set the historesist that the tanks can be at with hist
-    def pid_loop(self):
-        if self.temp or self.setTemp == None:
-            tprint(str(self.name) + "  Temperature or Set Temperature not set properly")
-            pass
-        elif abs(self.temp - self.setTemp)>3:
-            self.valveState = True
-        else:
-            self.valveState = False
+    # def pid_loop(self):
+    #     while True:
+    #         if self.mode == "PID":
+    #             if abs(self.temp - self.setTemp)>1:
+    #                 self.valveState = True
+    #                 tprint(str(self.name) + "   Mode:" + str(self.mode))
+    #             else:
+    #                 self.valveState = False
+    #         sleep(1)
+    # ####Call to keep the valve open#make this a preset to 34 degrees
+    # def crash(self):
+    #     if self.mode == "CRASH":
+    #         self.valveState = True
+    #         tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
+    #     sleep(1)
+    # ###Call to keep the valve closed
+    # def alwaysOff(self):
+    #     if self.mode == "OFF":
+    #         self.valveState = False
+    #         tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
+    #     sleep(1)
 
-    ####Call to keep the valve open
-    def crash(self):
-        self.valveState = True
-        tprint(str(self.name) + "  Crash this mofo to start drinking. Set temp:")
-
-    ###Call to keep the valve closed
-    def alwaysOff(self):
-        self.valveState = False
-        tprint(str(self.name) + "  Tank Turned Off")
 
 
 ##############################
