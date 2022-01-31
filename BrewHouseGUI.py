@@ -14,7 +14,7 @@ setTemp = 0
 
 # root window
 root = ttk.Window("Brew", "superhero",resizable=(False, False))
-frame = ttk.Frame()
+#frame = ttk.Frame()
 root.geometry('800x600') #1280x1024
 
 # create a notebook
@@ -25,16 +25,27 @@ notebook.pack(pady=0, expand=True)
 frame1 = ttk.Frame(notebook, width=800, height=580)
 frame2 = ttk.Frame(notebook, width=800, height=580)
 frame3 = ttk.Frame(notebook, width=800, height=580)
+frame4 = ttk.Frame(notebook, width=800, height=580)
+
+
 
 
 frame1.pack(fill='both', expand=True)
 frame2.pack(fill='both', expand=True)
 frame3.pack(fill='both', expand=True)
+frame4.pack(fill='both', expand=True)
+
+
+
+
 # add frames to notebook
 
 notebook.add(frame1, text='Brewhouse')
 notebook.add(frame2, text='Fermentation Tanks')
 notebook.add(frame3, text='Serving Tanks')
+notebook.add(frame4, text='Debug')
+
+
 
 ###########################################
 ####BREW HOUSE#############################
@@ -70,12 +81,12 @@ brewery1.hltSetTempPlusButton.place(x=180, y=210, anchor ='ne')
 ###########################################
 sTanks=['ST1','ST2','ST3','ST4','ST5', 'ST6']
 STANKS = []
-fTanks=['FT1','FT2','FT3','FT4']
+fTanks=['FT1','FT2','FT3','FT4', 'FT5']
 FTANKS = []
 
 def tankCreator(tanks1,frameNumber,TANKS):
     thread = 1
-    xf = 0
+    xf = 100
     yf = 0
     count = 0
     for i in tanks1:
@@ -83,28 +94,27 @@ def tankCreator(tanks1,frameNumber,TANKS):
             pass
         elif count >3:
             count = 0
-            xf = 0
-            yf += 200
+            xf = 100
+            yf += 210
             pass
         i = bh.Fermentation(i,thread,frameNumber)
-        i.fermMeter.place(x=xf,y=yf,anchor='nw')
-        i.crashButton.place(x=xf+110,y=yf+160,anchor='n')
-        i.onButton.place(x=xf+110,y=yf+200,anchor='n')
-        i.offButton.place(x=xf+110,y=yf+240,anchor='n')
-        xf += 195
+        i.labelFrame.place(x=xf-100,y=yf,anchor='nw')
+
+        xf += 200
         TANKS.append(i)
         count += 1
         thread += 1
-#tankCreator(sTanks, frame3, STANKS)
+        i.daemon = True
+        i.start()
+
+
 tankCreator(fTanks, frame2, FTANKS)
 
 
-FTANKS[0].start()
-FTANKS[1].start()
-FTANKS[2].start()
+
 ##############Debug Window###################
 output = ScrolledText()
-output.place(x = 10, rely = 1.0, height = 50,width = 780, anchor ='sw')
+output.place(x = 10, rely = 1.0, height = 70,width = 780, anchor ='sw')
 pl = fun.PrintLogger(output)
 sys.stdout=pl
 

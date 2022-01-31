@@ -5,7 +5,7 @@ from simple_pid import PID
 import ttkbootstrap as ttk
 from time import sleep, perf_counter
 import threading
-
+from random import randint
 
 ##############################
 ##############################
@@ -16,54 +16,161 @@ class Fermentation(threading.Thread):
     and where the heat dissipates slowly over time
     """
     def __init__(self,name,threadID,frame):
+
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.name = name
-        self.temp = 30
+        self.temp = 100
         self.setTemp = 33
         self.valveState = False
         self.mode = None
 
-        self.fermMeter = ttk.Meter(
-                            master=frame,
-                            metersize=180,
-                            padding = 20,
-                            amountused= self.temp,
-                            textright='°F',
-                            amounttotal= 80,
-                            metertype='semi',
-                            subtext=self.name,
-                            bootstyle='primary',
-                            interactive=False)
+        #for the radio buttons to function
+        self.v = ttk.IntVar()
+        #preset the radiobutton to OFF
+        self.v.set(300)
+
+        self.labelFrame = ttk.Labelframe(
+                                        frame,
+                                        bootstyle="success",
+                                        text = str(self.name),
+                                        height= 200,
+                                        width = 200,
+                                        borderwidth=10
+                                         )
+
+        self.fermMeter = ttk.Label(
+                                    self.labelFrame,
+                                    text = str(self.temp) + u"\N{DEGREE SIGN}",
+                                    borderwidth = 5,
+                                    font=("Helvetica", 30, 'bold'),
+                                    bootstyle='primary'
+                                    )
+
+        self.setTempLabel = ttk.Label(
+                                    self.labelFrame,
+                                    text = "SET TEMP:   " + str(self.setTemp) + u"\N{DEGREE SIGN}",
+                                    borderwidth = 5,
+                                    font=("Helvetica", 10, 'bold'),
+                                    bootstyle='primary'
+                                    )
+
+
 
 
         def nameCrash():
             self.mode = "CRASH"
+            self.setTemp = 34
             tprint(str(self.name) + "   Mode:" + str(self.mode))
-        self.crashButton = ttk.Button(
-                            frame,
+        self.crashButton = ttk.Radiobutton(
+                            self.labelFrame,
                             text="CRASH",
                             bootstyle="info-outline-toolbutton",
-                            command = nameCrash )
+                            variable=self.v,
+                            command = nameCrash,
+                            value = 100,
+                            width = 6.8)
         def namePID():
             self.mode = "PID"
+            self.setTemp = 68
             tprint(str(self.name) + "   Mode:" + str(self.mode))
-        self.onButton = ttk.Button(
-                            frame,
+        self.onButton = ttk.Radiobutton(
+                            self.labelFrame,
                             text="ON",
                             bootstyle="info-outline-toolbutton",
-                            command = namePID)
+                            variable=self.v,
+                            command = namePID,
+                            value=200,
+                            width = 6)
+
+
+        def ferm():
+            self.mode = "PID"
+            self.setTemp = 68
+            tprint(str(self.name) + "   Mode:" + str(self.mode))
+        self.serveButton = ttk.Radiobutton(
+                            self.labelFrame,
+                            text="FERM",
+                            bootstyle="info-outline-toolbutton",
+                            variable=self.v,
+                            command = ferm,
+                            value=400,
+                            width = 11)
+
+        def serve():
+            self.mode = "PID"
+            self.setTemp = 42
+            tprint(str(self.name) + "   Mode:" + str(self.mode))
+        self.fermButton = ttk.Radiobutton(
+                            self.labelFrame,
+                            text="SERVE",
+                            bootstyle="info-outline-toolbutton",
+                            variable=self.v,
+                            command = serve,
+                            value=500,
+                            width = 11)
+
         def nameOff():
             self.mode = "OFF"
+            self.setTemp = None
             tprint(str(self.name) + "   Mode:" + str(self.mode))
-        self.offButton = ttk.Button(
-                            frame,
+        self.offButton = ttk.Radiobutton(
+                            self.labelFrame,
                             text="OFF",
                             bootstyle="info-outline-toolbutton",
-                            command = nameOff)
+                            variable=self.v,
+                            command = nameOff,
+                            value = 300,
+                            width = 6)
+        def increaseSet():
+            self.setTemp += 1
+            tprint(str(self.name) + "Set Temperature Increased to: " + str(self.setTemp))
+
+        self.SetTempPlusButton = ttk.Button(self.labelFrame,
+                                    text="+",
+                                    bootstyle="info-outline-toolbutton",
+                                    command= increaseSet,
+                                    width = 3,
+                                    padding =3
+                                    )
+        def decreaseSet():
+            self.setTemp -= 1
+            tprint(str(self.name) + "Set Temperature Decreased to: " + str(self.setTemp))
+
+        self.SetTempMinusButton =ttk.Button(self.labelFrame,
+                                    text="-",
+                                    bootstyle="info-outline-toolbutton",
+                                    command= decreaseSet,
+                                    width = 3,
+                                    padding = 3
+                                    )
+
+
+
+
+        self.fermMeter.place(relx=.5, rely=0, anchor ='n')
+        self.setTempLabel.place(relx=.5, rely=.45, anchor='n')
+        self.offButton.place(relx=.15, rely=.6, anchor ='n')
+        self.onButton.place(relx=.5, rely=.6, anchor ='n')
+        self.crashButton.place(relx=.85, rely=.6, anchor ='n')
+
+        self.serveButton.place(relx=.25, rely=.8, anchor ='n')
+        self.fermButton.place(relx=.75, rely=.8, anchor ='n')
+
+        self.SetTempPlusButton.place(relx=1, rely=.4, height = 30, anchor ='ne')
+        self.SetTempMinusButton.place(relx=0, rely=.4, height = 30, anchor ='nw')
+
+    ######This is the main thread for the class
     def run(self):
-        print ("Starting Fermenation Class Running, ID:"  + self.name)
+        print ("Run Fermentation Clss Thread:  "  + self.name)
         while True:
+
+
+            self.temp = randint(0,212)  #####Here is where we need to pass in the TempSensor#####
+            #self.setTemp = randint(0,30)
+
+            self.fermMeter['text']= str(self.temp) + u"\N{DEGREE SIGN}"
+            self.setTempLabel['text']= text = "SET TEMP:   " + str(self.setTemp) + u"\N{DEGREE SIGN}"
 
             if self.mode == "PID":
                 if abs(self.temp - self.setTemp)>1:
@@ -83,35 +190,10 @@ class Fermentation(threading.Thread):
                 self.valveState = False
                 tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                 sleep(2)
-                print ("Exiting, ID:"  + self.name)
+
             else:
                 sleep(2)
                 pass
-
-    ###Set the historesist that the tanks can be at with hist
-    # def pid_loop(self):
-    #     while True:
-    #         if self.mode == "PID":
-    #             if abs(self.temp - self.setTemp)>1:
-    #                 self.valveState = True
-    #                 tprint(str(self.name) + "   Mode:" + str(self.mode))
-    #             else:
-    #                 self.valveState = False
-    #         sleep(1)
-    # ####Call to keep the valve open#make this a preset to 34 degrees
-    # def crash(self):
-    #     if self.mode == "CRASH":
-    #         self.valveState = True
-    #         tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
-    #     sleep(1)
-    # ###Call to keep the valve closed
-    # def alwaysOff(self):
-    #     if self.mode == "OFF":
-    #         self.valveState = False
-    #         tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
-    #     sleep(1)
-
-
 
 ##############################
 ##############################
