@@ -10,7 +10,7 @@ sensors_map = { sensors[0]: "FV1  = ",
 
 def read_temp(id):
   sensor = "/sys/devices/w1_bus_master1/" + id + "/w1_slave"
-  temp = -125.0 # error value
+  temp = 125.0 # error value
   try:
     f = open(sensor, "r")
     data = f.read()
@@ -20,23 +20,25 @@ def read_temp(id):
       temp = float(partitioned[2]) / 1000.0
       temp = temp * 9.0 / 5.0 + 32.0
       temp = round(temp, 1)
-      #temp_f = temp_c * 9.0 / 5.0 + 32.0
+      temp_f = temp_c * 9.0 / 5.0 + 32.0
   except Exception:
-    pass
+      temp = 2000
+    #pass
 
   return temp
 
-temps = {}
-timenow = time.asctime
-for sensor in sensors:
-  temp = read_temp(sensor)
-  print('%s%.2f' % (sensors_map[sensor], temp))
-  temps[sensor]=temp
+if __name__ == '__main__':
+    temps = {}
+    timenow = time.asctime
+    for sensor in sensors:
+      temp = read_temp(sensor)
+      print('%s%.2f' % (sensors_map[sensor], temp))
+      temps[sensor]=temp
 
 
-with open('ds18b20temps.csv', 'a', newline='') as csvfile:
-  writer = csv.writer(csvfile)
-  writer.writerow([timenow(), temps[sensors[0]], temps[sensors[1]]])
+    with open('ds18b20temps.csv', 'a', newline='') as csvfile:
+      writer = csv.writer(csvfile)
+      writer.writerow([timenow(), temps[sensors[0]], temps[sensors[1]]])
 
 
 

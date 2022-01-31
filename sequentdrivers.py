@@ -60,8 +60,8 @@ ST_board = 4 #8 relay board for serving/brite tanks
 
 
 ## Assign numbers to RTD temperature sensors corresponding to channel numbers on Sequent Micorsystems RTD 8 channel board
-HLT_RTD = 1 
-MLT_RTD = 2 
+HLT_RTD = 1
+MLT_RTD = 2
 KET_RTD = 3
 HEX_RTD = 4
 H2O_RTD = 5 #input water temperature sensor
@@ -142,17 +142,17 @@ def kettleSetOff():
     kettleOn = False
 
 def fillHLT_withRO():
-    
+
     #add if statement to check HLT full or not1
-    
+
     OUTPUTS.set(MOS_board, roFilterPower, 1)
     OUTPUTS.set(MOS_board, roHLTfillSolenoid, 1)
     print("Fill HLT with RO water")
-    
+
 def fillHLT_withCity():
     OUTPUTS.set(MOS_board, cityROfillSolenoid, 1)
     print("Fill HLT with city water")
-    
+
 #turns off RO filter, HLT RO solenoid, HLT city solenoid
 def stopHLTFill():
     OUTPUTS.set(MOS_board, roFilterPower, 0)
@@ -162,10 +162,10 @@ def stopHLTFill():
 
 def setHLTPump(HLTPumpSpeed): #duty cycle passed from python GUI. May need to divide by 10 to get 0-10v value
     IO.set0_10Out(MEGA_board, HLTPump, HLTPumpSpeed)
-    
+
 def setMashPump(mashPumpSpeed): #duty cycle passed from python GUI. May need to divide by 10 to get 0-10v value
     IO.set0_10Out(MEGA_board, mashPump, mashPumpSpeed)
-    
+
 def setKettlePump(kettlePumpSpeed): #duty cycle passed from python GUI. May need to divide by 10 to get 0-10v value
     IO.set0_10Out(MEGA_board, kettlePump, kettlePumpSpeed)
 
@@ -185,22 +185,28 @@ def FVTankOffTEST(j):
     RELAYS.set(FV_board, j, 0) #for Sequent 8 relay board
     print("tank off")
     #GPIO.output(FV1, GPIO.LOW)
-    
+
 def testRelayBoard():
     i = 1
     while i <= 8:
         FVTankOnTEST(i)
-        
+
         time.sleep(.5)
-        
+
         FVTankOffTEST(i)
-        
+
         time.sleep(.5)
         i += 1
-        
-def
 
-#TESTING BELOW THIS LINE
+
+
+def relayOn(boardNumber,channelNumber):
+    RELAYS.set(boardNumber,channelNumber,1)
+
+def relayOff(boardNumber,channelNumber):
+    RELAYS.set(boardNumber,channelNumber,0)
+
+
 
 
 if __name__ == "__main__":
@@ -214,8 +220,8 @@ if __name__ == "__main__":
     #print(IO.get0_10In(2, 1)) #gets voltage from 0-10V input on IO board ID#2
 
     #print(RTD.get(RTD_board, HLT_RTD)) #get temperature from RTD board ID#0 channel 1
-    
-    
+
+
     #print(getHLTtemp()) #prints HLTtemp returnd by getHLTtemp()
     #HLTSeton() #turn HLT contactor on- still have to turn on solid state relays seperately
     #kettleSetOn()
@@ -225,5 +231,5 @@ if __name__ == "__main__":
     #stopHLTFill()
     #HLTSetoff()
     print("Running")
-    
+
     #while True:

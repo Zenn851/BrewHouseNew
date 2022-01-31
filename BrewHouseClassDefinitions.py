@@ -6,6 +6,9 @@ import ttkbootstrap as ttk
 from time import sleep, perf_counter
 import threading
 from random import randint
+from ds18b20testing import read_temp
+from sequentdrivers import relayOn, relayOff
+import os
 
 ##############################
 ##############################
@@ -15,15 +18,17 @@ class Fermentation(threading.Thread):
     Simple simulation of a water boiler which can heat up water
     and where the heat dissipates slowly over time
     """
-    def __init__(self,name,threadID,frame):
+    def __init__(self,name,threadID,frame,tempAddress="28-0721705c2caa",valveAddress=(3,1)):
 
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.name = name
-        self.temp = 100
-        self.setTemp = 33
+        self.temp = 12
+        self.setTemp = 33.0
         self.valveState = False
         self.mode = None
+        self.tempAddress = tempAddress
+        self.valveAddress = valveAddress
 
         #for the radio buttons to function
         self.v = ttk.IntVar()
@@ -95,7 +100,7 @@ class Fermentation(threading.Thread):
                             variable=self.v,
                             command = ferm,
                             value=400,
-                            width = 11)
+                            width = 8)
 
         def serve():
             self.mode = "PID"
@@ -108,7 +113,7 @@ class Fermentation(threading.Thread):
                             variable=self.v,
                             command = serve,
                             value=500,
-                            width = 11)
+                            width = 8)
 
         def nameOff():
             self.mode = "OFF"
@@ -166,28 +171,34 @@ class Fermentation(threading.Thread):
         while True:
 
 
-            self.temp = randint(0,212)  #####Here is where we need to pass in the TempSensor#####
+            #self.temp = randint(0,212)  #####Here is where we need to pass in the TempSensor#####
+            self.temp = read_temp(self.tempAddress)
             #self.setTemp = randint(0,30)
 
             self.fermMeter['text']= str(self.temp) + u"\N{DEGREE SIGN}"
-            self.setTempLabel['text']= text = "SET TEMP:   " + str(self.setTemp) + u"\N{DEGREE SIGN}"
+            # self.setTempLabel['text']= text = "SET TEMP:   " + str(self.setTemp) + u"\N{DEGREE SIGN}"
 
             if self.mode == "PID":
-                if abs(self.temp - self.setTemp)>1:
+                if (self.temp - self.setTemp)>1:
                     self.valveState = True
+                    relayOn(self.valveAddress[0], self.valveAddress[1])
                     tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                     sleep(2)
                 else:
                     self.valveState = False
+                    relayOff(self.valveAddress[0], self.valveAddress[1])
+                    #closeValve(valveAddress)
                     sleep(2)
 
             elif self.mode == "CRASH":
                 self.valveState = True
+                relayOn(self.valveAddress[0], self.valveAddress[1])
                 tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                 sleep(2)
 
             elif self.mode == "OFF":
                 self.valveState = False
+                relayOff(self.valveAddress[0], self.valveAddress[1])
                 tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                 sleep(2)
 

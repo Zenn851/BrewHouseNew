@@ -81,7 +81,7 @@ brewery1.hltSetTempPlusButton.place(x=180, y=210, anchor ='ne')
 ###########################################
 sTanks=['ST1','ST2','ST3','ST4','ST5', 'ST6']
 STANKS = []
-fTanks=['FT1','FT2','FT3','FT4', 'FT5']
+fTanks=['FT1','FT2','FT3','FT4', 'FT5','FT6']
 FTANKS = []
 
 def tankCreator(tanks1,frameNumber,TANKS):
