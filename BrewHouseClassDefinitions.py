@@ -26,15 +26,15 @@ class Fermentation(threading.Thread):
     Simple simulation of a water boiler which can heat up water
     and where the heat dissipates slowly over time
     """
-    def __init__(self,name,threadID,frame,tempAddress="28-0721705c2caa",valveAddress=(3,1)):
+    def __init__(self,name,threadID,frame,tempAddress="28-0721705c2caa",valveAddress=(3,1),setTemp = None, mode = "OFF"):
 
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.name = name
         self.temp = 12
-        self.setTemp = 33.0
+        self.setTemp = setTemp
         self.valveState = False
-        self.mode = None
+        self.mode = mode
         self.tempAddress = tempAddress
         self.valveAddress = valveAddress
 
@@ -175,7 +175,11 @@ class Fermentation(threading.Thread):
 
     ######This is the main thread for the class
     def run(self):
-        print ("Run Fermentation Clss Thread:  "  + self.name)
+        print ("Run Fermentation Class Thread:  "  + self.name)
+        print("Temperature Sencor Address: "+ self.tempAddress)
+        print("Valve Solenoid Board/Relay: "+ self.valveAddress)
+        print("Previous Set Temperate: "+ str(self.setTemp))
+        print("Mode Initialized to : "+ self.mode)
         while True:
 
 

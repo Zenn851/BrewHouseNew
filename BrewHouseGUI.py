@@ -5,11 +5,13 @@ from tkinter.scrolledtext import ScrolledText
 import TTKfunctions as fun
 import BrewHouseClassDefinitions as bh
 from BrewHouseClassDefinitions import tprint
+import pandas as pd
 import sys
-#import ds18b20testing as DS18B20
 
-temp = 0
-setTemp = 0
+####read in the tank info
+tankInfo = pd.read_csv('tankInfo.csv',index_col=0)
+print(tankInfo)
+
 
 
 # root window
@@ -79,37 +81,62 @@ brewery1.hltSetTempPlusButton.place(x=180, y=210, anchor ='ne')
 ###########################################
 ####Fermentation/ServingTanks#############################
 ###########################################
-sTanks=['ST1','ST2','ST3','ST4','ST5', 'ST6']
 
-fTanks=['FT1','FT2','FT3','FT4', 'FT5','FT6']
-
-
-def tankCreator(tanks1,frameNumber):
+def tankCreator(df):
     thread = 1
-    xf = 100
-    yf = 0
-    count = 0
-    for i in tanks1:
-        if count <= 3:
-            pass
-        elif count >3:
-            count = 0
-            xf = 100
-            yf += 210
-            pass
-        i = bh.Fermentation(i,thread,frameNumber)
-        i.labelFrame.place(x=xf-100,y=yf,anchor='nw')
+    col1 = 0
+    row1 = 0
+    col2 = 0
+    row2 = 0
+    for index, row in df.iterrows():
 
-        xf += 200
-        count += 1
-        thread += 1
-        i.daemon = True
-        i.start()
+        if row['Frame'] == "frame2":
+            i = bh.Fermentation(index,
+                                thread,
+                                frame2,
+                                tempAddress = row['TempAddress'],
+                                valveAddress = row['ValveAddress'],
+                                setTemp = row['SetTemp'],
+                                mode = row['Mode'])
+            i.daemon = True
+            i.start()
+            thread += 1
+            if col1 < 3:
+                i.labelFrame.grid(column = col1, row=row1)
+                col1 += 1
+            elif col1 == 4:
+                col1 = 0
+                row1+=1
+                i.labelFrame.grid(column = col1, row=row1)
+                col1+=1
+            else:
+                i.labelFrame.grid(column = col1, row=row1)
+                col1+=1
 
+        elif row['Frame'] == "frame3":
+            i = bh.Fermentation(index,
+                                thread,
+                                frame3,
+                                tempAddress = row['TempAddress'],
+                                valveAddress = row['ValveAddress'],
+                                setTemp = row['SetTemp'],
+                                mode = row['Mode'])
+            i.daemon = True
+            i.start()
+            thread += 1
+            if col2 < 3:
+                i.labelFrame.grid(column = col2, row=row2)
+                col2 += 1
+            elif col2 == 4:
+                col2 = 0
+                row2+=1
+                i.labelFrame.grid(column = col2, row=row2)
+                col2+=1
+            else:
+                i.labelFrame.grid(column = col2, row=row2)
+                col2+=1
 
-tankCreator(fTanks, frame2)
-
-
+tankCreator(tankInfo)
 
 ##############Debug Window###################
 output = ScrolledText(frame4)
