@@ -8,7 +8,7 @@ import threading
 from random import randint
 import os
 
-Debug = True
+Debug = False
 
 if Debug == False:
     from ds18b20testing import read_temp
@@ -189,24 +189,24 @@ class Fermentation(threading.Thread):
             if self.mode == "PID":
                 if (self.temp - self.setTemp)>1:
                     self.valveState = True
-                    relayOn(self.valveAddress[0], self.valveAddress[1])
+                    #relayOn(self.valveAddress[0], self.valveAddress[1])
                     tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                     sleep(2)
                 else:
                     self.valveState = False
-                    relayOff(self.valveAddress[0], self.valveAddress[1])
+                    #relayOff(self.valveAddress[0], self.valveAddress[1])
                     #closeValve(valveAddress)
                     sleep(2)
 
             elif self.mode == "CRASH":
                 self.valveState = True
-                relayOn(self.valveAddress[0], self.valveAddress[1])
+                #relayOn(self.valveAddress[0], self.valveAddress[1])
                 tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                 sleep(2)
 
             elif self.mode == "OFF":
                 self.valveState = False
-                relayOff(self.valveAddress[0], self.valveAddress[1])
+                #relayOff(self.valveAddress[0], self.valveAddress[1])
                 tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                 sleep(2)
 
