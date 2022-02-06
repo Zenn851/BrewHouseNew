@@ -8,7 +8,7 @@ import threading
 from random import randint
 import os
 
-Debug = False
+Debug = True
 
 if Debug == False:
     from ds18b20testing import read_temp
@@ -179,8 +179,8 @@ class Fermentation(threading.Thread):
         while True:
 
 
-            #self.temp = randint(0,212)  #####Here is where we need to pass in the TempSensor#####
-            self.temp = read_temp(self.tempAddress)
+            self.temp = randint(0,212)  #####Here is where we need to pass in the TempSensor#####
+            #self.temp = read_temp(self.tempAddress)
             #self.setTemp = randint(0,30)
 
             self.fermMeter['text']= str(self.temp) + u"\N{DEGREE SIGN}"
@@ -191,27 +191,27 @@ class Fermentation(threading.Thread):
                     self.valveState = True
                     #relayOn(self.valveAddress[0], self.valveAddress[1])
                     tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
-                    sleep(2)
+                    sleep(1)
                 else:
                     self.valveState = False
                     #relayOff(self.valveAddress[0], self.valveAddress[1])
                     #closeValve(valveAddress)
-                    sleep(2)
+                    sleep(1)
 
             elif self.mode == "CRASH":
                 self.valveState = True
                 #relayOn(self.valveAddress[0], self.valveAddress[1])
                 tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
-                sleep(2)
+                sleep(1)
 
             elif self.mode == "OFF":
                 self.valveState = False
                 #relayOff(self.valveAddress[0], self.valveAddress[1])
                 tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
-                sleep(2)
+                sleep(1)
 
             else:
-                sleep(2)
+                sleep(1)
                 pass
 
 ##############################

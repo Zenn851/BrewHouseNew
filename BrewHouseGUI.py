@@ -80,11 +80,11 @@ brewery1.hltSetTempPlusButton.place(x=180, y=210, anchor ='ne')
 ####Fermentation/ServingTanks#############################
 ###########################################
 sTanks=['ST1','ST2','ST3','ST4','ST5', 'ST6']
-STANKS = []
-fTanks=['FT1','FT2','FT3','FT4', 'FT5','FT6']
-FTANKS = []
 
-def tankCreator(tanks1,frameNumber,TANKS):
+fTanks=['FT1','FT2','FT3','FT4', 'FT5','FT6']
+
+
+def tankCreator(tanks1,frameNumber):
     thread = 1
     xf = 100
     yf = 0
@@ -101,20 +101,19 @@ def tankCreator(tanks1,frameNumber,TANKS):
         i.labelFrame.place(x=xf-100,y=yf,anchor='nw')
 
         xf += 200
-        TANKS.append(i)
         count += 1
         thread += 1
         i.daemon = True
         i.start()
 
 
-tankCreator(fTanks, frame2, FTANKS)
+tankCreator(fTanks, frame2)
 
 
 
 ##############Debug Window###################
-output = ScrolledText()
-output.place(x = 10, rely = 1.0, height = 70,width = 780, anchor ='sw')
+output = ScrolledText(frame4)
+output.pack(fill='both', expand = True)
 pl = fun.PrintLogger(output)
 sys.stdout=pl
 
@@ -126,17 +125,13 @@ def update():
     # random number gernating for debuggin.  Set Temp = Thermister
     temp = str(randint(0,212))
 
-    #DS18B20_1 =DS18B20.read_temp(DS18B20.sensors[0]) #read temp sensor
 
     ### Brew House Updates########
     brewery1.hltMeter.configure(amountused = temp)
     brewery1.bkMeter.configure(amountused = temp)
     brewery1.mashMeter.configure(amountused = temp)
 
-    # FTANKS[0].fermMeter.configure(amountused = FTANKS[0].temp)
-    # FTANKS[0].setTemp = 50
-    #
-    # STANKS[0].fermMeter.configure(amountused = temp)
+
 
     root.after(500,update)
 
