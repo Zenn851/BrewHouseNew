@@ -6,9 +6,17 @@ import ttkbootstrap as ttk
 from time import sleep, perf_counter
 import threading
 from random import randint
-from ds18b20testing import read_temp
-from sequentdrivers import relayOn, relayOff
 import os
+
+Debug = True
+
+if Debug == False:
+    from ds18b20testing import read_temp
+    from sequentdrivers import relayOn, relayOff
+
+
+
+
 
 ##############################
 ##############################
@@ -176,7 +184,7 @@ class Fermentation(threading.Thread):
             #self.setTemp = randint(0,30)
 
             self.fermMeter['text']= str(self.temp) + u"\N{DEGREE SIGN}"
-            # self.setTempLabel['text']= text = "SET TEMP:   " + str(self.setTemp) + u"\N{DEGREE SIGN}"
+            self.setTempLabel['text']= text = "SET TEMP:   " + str(self.setTemp) + u"\N{DEGREE SIGN}"
 
             if self.mode == "PID":
                 if (self.temp - self.setTemp)>1:
