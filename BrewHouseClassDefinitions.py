@@ -32,11 +32,13 @@ class Fermentation(threading.Thread):
         self.threadID = threadID
         self.name = name
         self.temp = 12
+        #self.temp = read_temp(self.tempAddress)
         self.setTemp = setTemp
         self.valveState = False
         self.mode = mode
         self.tempAddress = tempAddress
         self.valveAddress = valveAddress
+        self.tempDelay = 0
 
         #for the radio buttons to function
         self.v = ttk.IntVar()
@@ -83,19 +85,6 @@ class Fermentation(threading.Thread):
                             command = nameCrash,
                             value = 100,
                             width = 6.8)
-        def namePID():
-            self.mode = "PID"
-            self.setTemp = 68
-            tprint(str(self.name) + "   Mode:" + str(self.mode))
-        self.onButton = ttk.Radiobutton(
-                            self.labelFrame,
-                            text="ON",
-                            bootstyle="info-outline-toolbutton",
-                            variable=self.v,
-                            command = namePID,
-                            value=200,
-                            width = 6)
-
 
         def ferm():
             self.mode = "PID"
@@ -164,7 +153,6 @@ class Fermentation(threading.Thread):
         self.fermMeter.place(relx=.5, rely=0, anchor ='n')
         self.setTempLabel.place(relx=.5, rely=.45, anchor='n')
         self.offButton.place(relx=.15, rely=.6, anchor ='n')
-        self.onButton.place(relx=.5, rely=.6, anchor ='n')
         self.crashButton.place(relx=.85, rely=.6, anchor ='n')
 
         self.serveButton.place(relx=.25, rely=.8, anchor ='n')
@@ -173,6 +161,9 @@ class Fermentation(threading.Thread):
         self.SetTempPlusButton.place(relx=1, rely=.4, height = 30, anchor ='ne')
         self.SetTempMinusButton.place(relx=0, rely=.4, height = 30, anchor ='nw')
 
+
+
+
     ######This is the main thread for the class
     def run(self):
         print ("Run Fermentation Class Thread:  "  + self.name)
@@ -180,18 +171,24 @@ class Fermentation(threading.Thread):
         print("Valve Solenoid Board/Relay: "+ self.valveAddress)
         print("Previous Set Temperate: "+ str(self.setTemp))
         print("Mode Initialized to : "+ self.mode)
+
+        #Below code delays 10 seconds before reading the temp value
+        def tempCounter():
+            if self.tempDelay==10:
+                self.temp = randint(0,212)  #####Here is where we need to pass in the TempSensor#####
+                #self.temp = read_temp(self.tempAddress)
+                self.tempDelay = 0
+            else:
+                self.tempDelay += 1
+
         while True:
 
-
-            self.temp = randint(0,212)  #####Here is where we need to pass in the TempSensor#####
-            #self.temp = read_temp(self.tempAddress)
-            #self.setTemp = randint(0,30)
-
+            tempCounter()
             self.fermMeter['text']= str(self.temp) + u"\N{DEGREE SIGN}"
             self.setTempLabel['text']= text = "SET TEMP:   " + str(self.setTemp) + u"\N{DEGREE SIGN}"
 
             if self.mode == "PID":
-                if (self.temp - self.setTemp)>1:
+                if (self.temp - self.setTemp)>2:
                     self.valveState = True
                     #relayOn(self.valveAddress[0], self.valveAddress[1])
                     tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
@@ -199,14 +196,8 @@ class Fermentation(threading.Thread):
                 else:
                     self.valveState = False
                     #relayOff(self.valveAddress[0], self.valveAddress[1])
-                    #closeValve(valveAddress)
                     sleep(1)
 
-            elif self.mode == "CRASH":
-                self.valveState = True
-                #relayOn(self.valveAddress[0], self.valveAddress[1])
-                tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
-                sleep(1)
 
             elif self.mode == "OFF":
                 self.valveState = False
@@ -488,7 +479,7 @@ class Brewhouse:
 
 
 def tprint(*args):
-    stamp = str(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+    stamp = str(datetime.now().strftime('%Y-%m-%d %H:%M:%S \n'))
     print(str(*args) + " : "+stamp)
 
 
@@ -519,7 +510,7 @@ if __name__ == '__main__':
     water_temp = boiler.water_temp
 
     pid = PID(1, 0.01, 0.1, setpoint=water_temp)
-    pid.output_limits = (0, 100)
+    pid.output_limits = (0, 1)
 
     start_time = time.time()
     last_time = start_time

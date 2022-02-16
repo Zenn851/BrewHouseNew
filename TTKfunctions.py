@@ -1,4 +1,5 @@
 import ttkbootstrap as ttk
+from time import sleep as sleep
 import sys
 
 ###Create Radio Buttons
@@ -43,6 +44,8 @@ class PrintLogger: # create file like object
     def write(self, text):
         self.textbox.insert(ttk.END, text) # write text to textbox
         self.textbox.see(ttk.END)
+        
+
             # could also scroll to end of textbox here to make sure always visible
 
     def flush(self): # needed for file like object
