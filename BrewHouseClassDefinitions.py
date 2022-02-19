@@ -74,7 +74,7 @@ class Fermentation(threading.Thread):
 
 
         def nameCrash():
-            self.mode = "CRASH"
+            self.mode = "PID"
             self.setTemp = 34
             tprint(str(self.name) + "   Mode:" + str(self.mode))
         self.crashButton = ttk.Radiobutton(
@@ -173,41 +173,50 @@ class Fermentation(threading.Thread):
         print("Mode Initialized to : "+ self.mode)
 
         #Below code delays 10 seconds before reading the temp value
-        def tempCounter():
-            if self.tempDelay==10:
-                self.temp = randint(0,212)  #####Here is where we need to pass in the TempSensor#####
-                #self.temp = read_temp(self.tempAddress)
-                self.tempDelay = 0
-            else:
-                self.tempDelay += 1
 
         while True:
 
-            tempCounter()
+            self.temp = 34  #####Here is where we need to pass in the TempSensor#####
+            #self.temp = read_temp(self.tempAddress)
             self.fermMeter['text']= str(self.temp) + u"\N{DEGREE SIGN}"
             self.setTempLabel['text']= text = "SET TEMP:   " + str(self.setTemp) + u"\N{DEGREE SIGN}"
 
             if self.mode == "PID":
-                if (self.temp - self.setTemp)>2:
+                if self.temp > self.setTemp:
                     self.valveState = True
                     #relayOn(self.valveAddress[0], self.valveAddress[1])
                     tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
+                    self.labelFrame.configure(bootstyle ="danger")
                     sleep(1)
+
+                elif self.temp <= (self.setTemp -2):
+                    self.valveState = False
+                    #relayOn(self.valveAddress[0], self.valveAddress[1])
+                    tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
+                    self.labelFrame.configure(bootstyle ="success")
+                    sleep(1)
+
                 else:
                     self.valveState = False
                     #relayOff(self.valveAddress[0], self.valveAddress[1])
+                    tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
+                    self.labelFrame.configure(bootstyle ="success")
                     sleep(1)
+
 
 
             elif self.mode == "OFF":
                 self.valveState = False
                 #relayOff(self.valveAddress[0], self.valveAddress[1])
                 tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
+                self.labelFrame.configure(bootstyle ="success")
                 sleep(1)
 
+
             else:
+                tprint("not working")
                 sleep(1)
-                pass
+
 
 ##############################
 ##############################
