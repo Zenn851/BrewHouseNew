@@ -38,7 +38,7 @@ class Fermentation(threading.Thread):
         self.tempAddress = tempAddress
         self.temp = read_temp(self.tempAddress)
         self.valveBoard = valveBoard
-        self.vavleChannel = valveChannel
+        self.valveChannel = valveChannel
         self.theme = "secondary"
         self.class1 = class1
 
@@ -209,7 +209,7 @@ class Fermentation(threading.Thread):
     def run(self):
         print ("Run Fermentation Class Thread:  "  + self.name)
         print("Temperature Sencor Address: "+ self.tempAddress)
-        print("Valve Solenoid Board/Relay: "+ self.valveAddress)
+        #print("Valve Solenoid Board/Relay: "+ self.valveBoard)
         print("Previous Set Temperate: "+ str(self.setTemp))
         print("Mode Initialized to : "+ self.mode)
         def colorConfigure(state):
@@ -242,13 +242,13 @@ class Fermentation(threading.Thread):
 
                 elif self.temp <= (self.setTemp -2):
                     self.valveState = False
-                    relayOn(self.valveBoard, self.valveChannel)
+                    relayOff(self.valveBoard, self.valveChannel)
                     tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                     colorConfigure("danger")
                     sleep(1)
 
                 else:
-                    self.valveState = True
+                    self.valveState = False
                     relayOff(self.valveBoard, self.valveChannel)
                     tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                     colorConfigure("success")

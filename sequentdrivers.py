@@ -13,17 +13,7 @@ CLTfloatHigh = 9
 kettleFloat =10
 #HLTfloatIsFilled = False
 
-FV1_LED = 11
-FV2_LED = 12
-FV3_LED = 13
-FV4_LED = 14
 
-ST1_LED = 21
-ST2_LED = 22
-ST3_LED = 23
-ST4_LED = 24
-ST5_LED = 25
-ST6_LED = 26
 
 DS18b20_1 = "28-0721705c2caa"
 
@@ -37,16 +27,7 @@ GPIO.setup(CLTfloatHigh, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(kettleFloat, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 #Led assignments for tank controls- these do not control tanks- Sequent relay board does
-GPIO.setup(FV1_LED, GPIO.OUT)
-GPIO.setup(FV2_LED, GPIO.OUT)
-GPIO.setup(FV3_LED, GPIO.OUT)
-GPIO.setup(FV4_LED, GPIO.OUT)
-GPIO.setup(ST1_LED, GPIO.OUT)
-GPIO.setup(ST2_LED, GPIO.OUT)
-GPIO.setup(ST3_LED, GPIO.OUT)
-GPIO.setup(ST4_LED, GPIO.OUT)
-GPIO.setup(ST5_LED, GPIO.OUT)
-GPIO.setup(ST6_LED, GPIO.OUT)
+
 
 
 #Stack address of Sequent Microsystems boards 0 is closest to Pi- assigned by jumpers on boards- maximum of 8 boards
