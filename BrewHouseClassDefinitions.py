@@ -26,19 +26,21 @@ class Fermentation(threading.Thread):
     Simple simulation of a water boiler which can heat up water
     and where the heat dissipates slowly over time
     """
-    def __init__(self,name,threadID,frame,tempAddress="28-0721705c2caa",valveAddress=(3,1),setTemp = None, mode = "OFF"):
+    def __init__(self,name,threadID,frame, class1= "ferm", tempAddress="28-0721705c2caa",valveAddress=(3,1),setTemp = None, mode = "OFF"):
 
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.name = name
-        self.temp = 12
+        self.temp = 40
         #self.temp = read_temp(self.tempAddress)
         self.setTemp = setTemp
         self.valveState = False
         self.mode = mode
         self.tempAddress = tempAddress
         self.valveAddress = valveAddress
-        self.tempDelay = 0
+        self.theme = "secondary"
+        self.class1 = class1
+
 
         #for the radio buttons to function
         self.v = ttk.IntVar()
@@ -47,7 +49,7 @@ class Fermentation(threading.Thread):
 
         self.labelFrame = ttk.Labelframe(
                                         frame,
-                                        bootstyle="success",
+                                        bootstyle=self.theme,
                                         text = str(self.name),
                                         height= 200,
                                         width = 200,
@@ -59,7 +61,7 @@ class Fermentation(threading.Thread):
                                     text = str(self.temp) + u"\N{DEGREE SIGN}",
                                     borderwidth = 5,
                                     font=("Helvetica", 30, 'bold'),
-                                    bootstyle='primary'
+                                    bootstyle=self.theme
                                     )
 
         self.setTempLabel = ttk.Label(
@@ -67,7 +69,7 @@ class Fermentation(threading.Thread):
                                     text = "SET TEMP:   " + str(self.setTemp) + u"\N{DEGREE SIGN}",
                                     borderwidth = 5,
                                     font=("Helvetica", 10, 'bold'),
-                                    bootstyle='primary'
+                                    bootstyle=self.theme
                                     )
 
 
@@ -80,37 +82,37 @@ class Fermentation(threading.Thread):
         self.crashButton = ttk.Radiobutton(
                             self.labelFrame,
                             text="CRASH",
-                            bootstyle="info-outline-toolbutton",
+                            bootstyle=self.theme + "outline-toolbutton",
                             variable=self.v,
                             command = nameCrash,
                             value = 100,
-                            width = 6.8)
+                            width = 9)
 
         def ferm():
             self.mode = "PID"
             self.setTemp = 68
             tprint(str(self.name) + "   Mode:" + str(self.mode))
-        self.serveButton = ttk.Radiobutton(
+        self.fermButton = ttk.Radiobutton(
                             self.labelFrame,
                             text="FERM",
-                            bootstyle="info-outline-toolbutton",
+                            bootstyle=self.theme + "outline-toolbutton",
                             variable=self.v,
                             command = ferm,
                             value=400,
-                            width = 8)
+                            width = 9)
 
         def serve():
             self.mode = "PID"
             self.setTemp = 42
             tprint(str(self.name) + "   Mode:" + str(self.mode))
-        self.fermButton = ttk.Radiobutton(
+        self.serveButton = ttk.Radiobutton(
                             self.labelFrame,
                             text="SERVE",
-                            bootstyle="info-outline-toolbutton",
+                            bootstyle=self.theme + "outline-toolbutton",
                             variable=self.v,
                             command = serve,
                             value=500,
-                            width = 8)
+                            width = 23)
 
         def nameOff():
             self.mode = "OFF"
@@ -119,18 +121,18 @@ class Fermentation(threading.Thread):
         self.offButton = ttk.Radiobutton(
                             self.labelFrame,
                             text="OFF",
-                            bootstyle="info-outline-toolbutton",
+                            bootstyle=self.theme + "outline-toolbutton",
                             variable=self.v,
                             command = nameOff,
                             value = 300,
-                            width = 6)
+                            width = 23)
         def increaseSet():
             self.setTemp += 1
             tprint(str(self.name) + "Set Temperature Increased to: " + str(self.setTemp))
 
         self.SetTempPlusButton = ttk.Button(self.labelFrame,
                                     text="+",
-                                    bootstyle="info-outline-toolbutton",
+                                    bootstyle=self.theme + "outline-toolbutton",
                                     command= increaseSet,
                                     width = 3,
                                     padding =3
@@ -141,25 +143,63 @@ class Fermentation(threading.Thread):
 
         self.SetTempMinusButton =ttk.Button(self.labelFrame,
                                     text="-",
-                                    bootstyle="info-outline-toolbutton",
+                                    bootstyle=self.theme + "outline-toolbutton",
                                     command= decreaseSet,
+                                    width = 3,
+                                    padding = 3
+                                    )
+############################################################
+###########################################################
+############Debug###########################################
+        def increaseSet2():
+            self.temp += 1
+            tprint(str(self.name) + "Temperature Increased to: " + str(self.temp))
+
+        self.SetTempPlusButton2 = ttk.Button(self.labelFrame,
+                                    text="+",
+                                    bootstyle=self.theme + "outline-toolbutton",
+                                    command= increaseSet2,
+                                    width = 3,
+                                    padding =3
+                                    )
+        def decreaseSet2():
+            self.temp -= 1
+            tprint(str(self.name) + "Temperature Decreased to: " + str(self.temp))
+
+        self.SetTempMinusButton2 =ttk.Button(self.labelFrame,
+                                    text="-",
+                                    bootstyle=self.theme + "outline-toolbutton",
+                                    command= decreaseSet2,
                                     width = 3,
                                     padding = 3
                                     )
 
 
+################################################
 
 
-        self.fermMeter.place(relx=.5, rely=0, anchor ='n')
-        self.setTempLabel.place(relx=.5, rely=.45, anchor='n')
-        self.offButton.place(relx=.15, rely=.6, anchor ='n')
-        self.crashButton.place(relx=.85, rely=.6, anchor ='n')
+        if self.class1 == "ferm":
+            self.fermMeter.place(relx=.5, rely=0, anchor ='n')
+            self.setTempLabel.place(relx=.5, rely=.45, anchor='n')
 
-        self.serveButton.place(relx=.25, rely=.8, anchor ='n')
-        self.fermButton.place(relx=.75, rely=.8, anchor ='n')
+            self.offButton.place(relx=.5, rely=.85, anchor ='n')
+            self.crashButton.place(relx=.72, rely=.63, anchor ='n')
+            self.fermButton.place(relx=.28, rely=.63, anchor ='n')
 
-        self.SetTempPlusButton.place(relx=1, rely=.4, height = 30, anchor ='ne')
-        self.SetTempMinusButton.place(relx=0, rely=.4, height = 30, anchor ='nw')
+            self.SetTempPlusButton.place(relx=1, rely=.4, height = 30, anchor ='ne')
+            self.SetTempMinusButton.place(relx=0, rely=.4, height = 30, anchor ='nw')
+            self.SetTempPlusButton2.place(relx=1, rely=.2, height = 30, anchor ='ne')
+            self.SetTempMinusButton2.place(relx=0, rely=.2, height = 30, anchor ='nw')
+        else:
+            self.fermMeter.place(relx=.5, rely=0, anchor ='n')
+            self.setTempLabel.place(relx=.5, rely=.45, anchor='n')
+
+            self.offButton.place(relx=.5, rely=.85, anchor ='n')
+            self.serveButton.place(relx=.5, rely=.63, anchor ='n')
+
+            self.SetTempPlusButton.place(relx=1, rely=.4, height = 30, anchor ='ne')
+            self.SetTempMinusButton.place(relx=0, rely=.4, height = 30, anchor ='nw')
+
 
 
 
@@ -171,12 +211,22 @@ class Fermentation(threading.Thread):
         print("Valve Solenoid Board/Relay: "+ self.valveAddress)
         print("Previous Set Temperate: "+ str(self.setTemp))
         print("Mode Initialized to : "+ self.mode)
-
+        def colorConfigure(state):
+                self.theme = state
+                self.labelFrame.configure(bootstyle =self.theme)
+                self.fermMeter.configure(bootstyle =self.theme)
+                self.setTempLabel.configure(bootstyle =self.theme)
+                self.serveButton.configure(bootstyle =self.theme + "outline-toolbutton")
+                self.offButton.configure(bootstyle =self.theme + "outline-toolbutton")
+                self.fermButton.configure(bootstyle =self.theme + "outline-toolbutton")
+                self.crashButton.configure(bootstyle =self.theme + "outline-toolbutton")
+                self.SetTempPlusButton.configure(bootstyle =self.theme + "outline-toolbutton")
+                self.SetTempMinusButton.configure(bootstyle =self.theme + "outline-toolbutton")
         #Below code delays 10 seconds before reading the temp value
 
         while True:
 
-            self.temp = 34  #####Here is where we need to pass in the TempSensor#####
+            #self.temp = 34  #####Here is where we need to pass in the TempSensor#####
             #self.temp = read_temp(self.tempAddress)
             self.fermMeter['text']= str(self.temp) + u"\N{DEGREE SIGN}"
             self.setTempLabel['text']= text = "SET TEMP:   " + str(self.setTemp) + u"\N{DEGREE SIGN}"
@@ -186,21 +236,21 @@ class Fermentation(threading.Thread):
                     self.valveState = True
                     #relayOn(self.valveAddress[0], self.valveAddress[1])
                     tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
-                    self.labelFrame.configure(bootstyle ="danger")
+                    colorConfigure("primary")
                     sleep(1)
 
                 elif self.temp <= (self.setTemp -2):
                     self.valveState = False
                     #relayOn(self.valveAddress[0], self.valveAddress[1])
                     tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
-                    self.labelFrame.configure(bootstyle ="success")
+                    colorConfigure("danger")
                     sleep(1)
 
                 else:
-                    self.valveState = False
+                    self.valveState = True
                     #relayOff(self.valveAddress[0], self.valveAddress[1])
                     tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
-                    self.labelFrame.configure(bootstyle ="success")
+                    colorConfigure("success")
                     sleep(1)
 
 
@@ -209,7 +259,7 @@ class Fermentation(threading.Thread):
                 self.valveState = False
                 #relayOff(self.valveAddress[0], self.valveAddress[1])
                 tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
-                self.labelFrame.configure(bootstyle ="success")
+                colorConfigure("secondary")
                 sleep(1)
 
 
