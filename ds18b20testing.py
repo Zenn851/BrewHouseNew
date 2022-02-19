@@ -22,8 +22,8 @@ def read_temp(id):
       temp = round(temp, 1)
       temp_f = temp_c * 9.0 / 5.0 + 32.0
   except Exception:
-      temp = 2000
-    #pass
+      #temp = 2000
+      pass
 
   return temp
 

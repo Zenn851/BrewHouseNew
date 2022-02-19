@@ -8,7 +8,7 @@ import threading
 from random import randint
 import os
 
-Debug = True
+Debug = False
 
 if Debug == False:
     from ds18b20testing import read_temp
@@ -31,8 +31,8 @@ class Fermentation(threading.Thread):
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.name = name
-        self.temp = 40
-        #self.temp = read_temp(self.tempAddress)
+        #self.temp = 40
+        self.temp = read_temp(self.tempAddress)
         self.setTemp = setTemp
         self.valveState = False
         self.mode = mode
@@ -86,7 +86,7 @@ class Fermentation(threading.Thread):
                             variable=self.v,
                             command = nameCrash,
                             value = 100,
-                            width = 9)
+                            width = 7)
 
         def ferm():
             self.mode = "PID"
@@ -99,7 +99,7 @@ class Fermentation(threading.Thread):
                             variable=self.v,
                             command = ferm,
                             value=400,
-                            width = 9)
+                            width = 7)
 
         def serve():
             self.mode = "PID"
@@ -112,7 +112,7 @@ class Fermentation(threading.Thread):
                             variable=self.v,
                             command = serve,
                             value=500,
-                            width = 23)
+                            width = 17)
 
         def nameOff():
             self.mode = "OFF"
@@ -125,7 +125,7 @@ class Fermentation(threading.Thread):
                             variable=self.v,
                             command = nameOff,
                             value = 300,
-                            width = 23)
+                            width = 17)
         def increaseSet():
             self.setTemp += 1
             tprint(str(self.name) + "Set Temperature Increased to: " + str(self.setTemp))
@@ -183,8 +183,8 @@ class Fermentation(threading.Thread):
             self.setTempLabel.place(relx=.5, rely=.45, anchor='n')
 
             self.offButton.place(relx=.5, rely=.85, anchor ='n')
-            self.crashButton.place(relx=.72, rely=.63, anchor ='n')
-            self.fermButton.place(relx=.28, rely=.63, anchor ='n')
+            self.crashButton.place(relx=.74, rely=.63, anchor ='n')
+            self.fermButton.place(relx=.26, rely=.63, anchor ='n')
 
             self.SetTempPlusButton.place(relx=1, rely=.4, height = 30, anchor ='ne')
             self.SetTempMinusButton.place(relx=0, rely=.4, height = 30, anchor ='nw')
@@ -227,28 +227,28 @@ class Fermentation(threading.Thread):
         while True:
 
             #self.temp = 34  #####Here is where we need to pass in the TempSensor#####
-            #self.temp = read_temp(self.tempAddress)
+            self.temp = read_temp(self.tempAddress)
             self.fermMeter['text']= str(self.temp) + u"\N{DEGREE SIGN}"
             self.setTempLabel['text']= text = "SET TEMP:   " + str(self.setTemp) + u"\N{DEGREE SIGN}"
 
             if self.mode == "PID":
                 if self.temp > self.setTemp:
                     self.valveState = True
-                    #relayOn(self.valveAddress[0], self.valveAddress[1])
+                    relayOn(self.valveAddress[0], self.valveAddress[1])
                     tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                     colorConfigure("primary")
                     sleep(1)
 
                 elif self.temp <= (self.setTemp -2):
                     self.valveState = False
-                    #relayOn(self.valveAddress[0], self.valveAddress[1])
+                    relayOn(self.valveAddress[0], self.valveAddress[1])
                     tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                     colorConfigure("danger")
                     sleep(1)
 
                 else:
                     self.valveState = True
-                    #relayOff(self.valveAddress[0], self.valveAddress[1])
+                    relayOff(self.valveAddress[0], self.valveAddress[1])
                     tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                     colorConfigure("success")
                     sleep(1)
@@ -257,7 +257,7 @@ class Fermentation(threading.Thread):
 
             elif self.mode == "OFF":
                 self.valveState = False
-                #relayOff(self.valveAddress[0], self.valveAddress[1])
+                relayOff(self.valveAddress[0], self.valveAddress[1])
                 tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                 colorConfigure("secondary")
                 sleep(1)
