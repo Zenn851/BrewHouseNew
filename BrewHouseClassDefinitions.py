@@ -104,7 +104,7 @@ class Fermentation(threading.Thread):
 
         def serve():
             self.mode = "PID"
-            self.setTemp = 42
+            self.setTemp = 38
             tprint(str(self.name) + "   Mode:" + str(self.mode))
         self.serveButton = ttk.Radiobutton(
                             self.labelFrame,
@@ -231,28 +231,29 @@ class Fermentation(threading.Thread):
             self.temp = read_temp(self.tempAddress)
             self.fermMeter['text']= str(self.temp) + u"\N{DEGREE SIGN}"
             self.setTempLabel['text']= text = "SET TEMP:   " + str(self.setTemp) + u"\N{DEGREE SIGN}"
-
+            sleep(.2)
+            
             if self.mode == "PID":
                 if self.temp > self.setTemp:
                     self.valveState = True
                     relayOn(self.valveBoard, self.valveChannel)
                     tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                     colorConfigure("primary")
-                    sleep(1)
+                    #sleep(1)
 
                 elif self.temp <= (self.setTemp -2):
                     self.valveState = False
                     relayOff(self.valveBoard, self.valveChannel)
                     tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                     colorConfigure("danger")
-                    sleep(1)
+                    #sleep(1)
 
                 else:
                     self.valveState = False
                     relayOff(self.valveBoard, self.valveChannel)
                     tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                     colorConfigure("success")
-                    sleep(1)
+                    #sleep(1)
 
 
 
@@ -266,7 +267,7 @@ class Fermentation(threading.Thread):
 
             else:
                 tprint("not working")
-                sleep(1)
+                #sleep(1)
 
 
 ##############################

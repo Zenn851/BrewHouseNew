@@ -1,13 +1,13 @@
-Name,TempAddress,ValveBoard,ValveChannel,Temp,SetTemp,Time,Mode,Frame,Type
-FV1,28-09217063caaa,3,1,,,,OFF,frame2,ferm
-FV2,28-09217073acaa,3,2,,,,OFF,frame2,ferm
-FV3,28-072170587aaa,3,3,,,,OFF,frame2,ferm
-FV4,28-09217060ebaa,3,4,,,,OFF,frame2,ferm
-FV5,28-07217042a7aa,3,5,,,,OFF,frame2,ferm
-FV6,28-0721704eacaa,3,6,,,,OFF,frame2,ferm
-ST1,28-0921708e80aa,4,1,,,,OFF,frame3,serve
-ST2,28-0721704920aa,4,2,,,,OFF,frame3,serve
-ST3,28-0921706505aa,4,3,,,,OFF,frame3,serve
-ST4,28-0921705ba5aa,4,4,,,,OFF,frame3,serve
-ST5,28-09217070daaa,4,5,,,,OFF,frame3,serve
-ST6,28-07217057d5aa,4,6,,,,OFF,frame3,serve
+Name,TempAddress,ValveBoard,ValveChannel,Temp,SetTemp,Time,Mode,Frame,Type,Label,Tank Drop
+FV1,28-09217063caaa,3,1,,68,,OFF,frame2,ferm,1,
+FV2,28-09217073acaa,3,2,,68,,OFF,frame2,ferm,2,
+FV3,28-072170587aaa,3,3,,68,,OFF,frame2,ferm,3,
+FV4,28-09217060ebaa,3,4,,68,,OFF,frame2,ferm,4,
+FV5,28-07217042a7aa,3,5,,68,,OFF,frame2,ferm,5,
+FV6,28-0721704eacaa,3,6,,68,,OFF,frame2,ferm,6,
+ST1,28-0921708e80aa,4,1,,,,OFF,frame3,serve,7,
+ST2,28-0721704920aa,4,2,,,,OFF,frame3,serve,8,
+ST3,28-0921706505aa,4,3,,,,OFF,frame3,serve,9,
+ST4,28-0921705ba5aa,4,4,,,,OFF,frame3,serve,10,
+ST5,28-09217070daaa,4,5,,,,OFF,frame3,serve,11,
+ST6,28-07217057d5aa,4,6,,,,OFF,frame3,serve,12,
