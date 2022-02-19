@@ -26,18 +26,19 @@ class Fermentation(threading.Thread):
     Simple simulation of a water boiler which can heat up water
     and where the heat dissipates slowly over time
     """
-    def __init__(self,name,threadID,frame, class1= "ferm", tempAddress="28-0721705c2caa",valveAddress=(3,1),setTemp = None, mode = "OFF"):
+    def __init__(self,name,threadID,frame, class1= "ferm", tempAddress="28-0721705c2caa",valveBoard=3, valveChannel=1,setTemp = None, mode = "OFF"):
 
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.name = name
         #self.temp = 40
-        self.temp = read_temp(self.tempAddress)
         self.setTemp = setTemp
         self.valveState = False
         self.mode = mode
         self.tempAddress = tempAddress
-        self.valveAddress = valveAddress
+        self.temp = read_temp(self.tempAddress)
+        self.valveBoard = valveBoard
+        self.vavleChannel = valveChannel
         self.theme = "secondary"
         self.class1 = class1
 
@@ -234,21 +235,21 @@ class Fermentation(threading.Thread):
             if self.mode == "PID":
                 if self.temp > self.setTemp:
                     self.valveState = True
-                    relayOn(self.valveAddress[0], self.valveAddress[1])
+                    relayOn(self.valveBoard, self.valveChannel)
                     tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                     colorConfigure("primary")
                     sleep(1)
 
                 elif self.temp <= (self.setTemp -2):
                     self.valveState = False
-                    relayOn(self.valveAddress[0], self.valveAddress[1])
+                    relayOn(self.valveBoard, self.valveChannel)
                     tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                     colorConfigure("danger")
                     sleep(1)
 
                 else:
                     self.valveState = True
-                    relayOff(self.valveAddress[0], self.valveAddress[1])
+                    relayOff(self.valveBoard, self.valveChannel)
                     tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                     colorConfigure("success")
                     sleep(1)
@@ -257,7 +258,7 @@ class Fermentation(threading.Thread):
 
             elif self.mode == "OFF":
                 self.valveState = False
-                relayOff(self.valveAddress[0], self.valveAddress[1])
+                relayOff(self.valveBoard, self.valveChannel)
                 tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                 colorConfigure("secondary")
                 sleep(1)

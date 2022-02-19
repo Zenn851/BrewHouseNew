@@ -57,7 +57,8 @@ def tankCreator(df):
                                 thread,
                                 frame2,
                                 tempAddress = row['TempAddress'],
-                                valveAddress = row['ValveAddress'],
+                                valveBoard = int(row['ValveBoard']),
+                                valveChannel = int(row['ValveChannel']),
                                 setTemp = row['SetTemp'],
                                 class1 = row["Type"],
                                 mode = row['Mode'])
