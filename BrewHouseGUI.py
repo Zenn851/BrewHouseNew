@@ -7,6 +7,7 @@ import BrewHouseClassDefinitions as bh
 from BrewHouseClassDefinitions import tprint
 import pandas as pd
 import sys
+from time import sleep as sleep
 
 ####read in the tank info
 tankInfo = pd.read_csv('tankInfo.csv',index_col=0)
@@ -51,7 +52,6 @@ def tankCreator(df):
     col2 = 0
     row2 = 0
     for index, row in df.iterrows():
-
         if row['Frame'] == "frame2":
             i = bh.Fermentation(index,
                                 thread,
@@ -62,8 +62,7 @@ def tankCreator(df):
                                 setTemp = row['SetTemp'],
                                 class1 = row["Type"],
                                 mode = row['Mode'])
-            i.daemon = True
-            i.start()
+            i.setDaemon(True)
             thread += 1
             if col1 < 3:
                 i.labelFrame.grid(column = col1, row=row1)
@@ -76,7 +75,7 @@ def tankCreator(df):
             else:
                 i.labelFrame.grid(column = col1, row=row1)
                 col1+=1
-
+            i.start()
         elif row['Frame'] == "frame3":
             i = bh.Fermentation(index,
                                 thread,
@@ -87,7 +86,7 @@ def tankCreator(df):
                                 setTemp = row['SetTemp'],
                                 class1 = row["Type"],
                                 mode = row['Mode'])
-            i.daemon = True
+            i.setDaemon(True)
             i.start()
             thread += 1
             if col2 < 3:
@@ -101,7 +100,6 @@ def tankCreator(df):
             else:
                 i.labelFrame.grid(column = col2, row=row2)
                 col2+=1
-
 tankCreator(tankInfo)
 ###########################################
 ##############Debug Window#################
