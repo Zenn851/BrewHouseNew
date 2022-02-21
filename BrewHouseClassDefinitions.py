@@ -32,7 +32,7 @@ class Fermentation(threading.Thread):
     Simple simulation of a water boiler which can heat up water
     and where the heat dissipates slowly over time
     """
-    def __init__(self,name,threadID,frame="frame2",class1= "ferm", tempAddress="28-0721705c2caa",valveBoard=3, valveChannel=1,setTemp = None, mode = "OFF"):
+    def __init__(self,name,threadID,frame="frame2",class1= "ferm", tempAddress="28-0721705c2caa",valveBoard=3, valveChannel=1,setTemp = None, mode = "OFF", hys = 2):
 
         threading.Thread.__init__(self)
         self.threadID = threadID
@@ -46,6 +46,7 @@ class Fermentation(threading.Thread):
         self.valveChannel = valveChannel
         self.theme = "secondary"
         self.class1 = class1
+        self.hys = hys
 
 
         #for the radio buttons to function
@@ -62,7 +63,7 @@ class Fermentation(threading.Thread):
                                         borderwidth=10
                                          )
 
-        self.fermMeter = ttk.Label(
+        self.tempLabel = ttk.Label(
                                     self.labelFrame,
                                     text = str(self.temp) + u"\N{DEGREE SIGN}",
                                     borderwidth = 5,
@@ -185,7 +186,7 @@ class Fermentation(threading.Thread):
 
 
         if self.class1 == "ferm":
-            self.fermMeter.place(relx=.5, rely=0, anchor ='n')
+            self.tempLabel.place(relx=.5, rely=0, anchor ='n')
             self.setTempLabel.place(relx=.5, rely=.45, anchor='n')
 
             self.offButton.place(relx=.5, rely=.85, anchor ='n')
@@ -197,7 +198,7 @@ class Fermentation(threading.Thread):
             #self.SetTempPlusButton2.place(relx=1, rely=.2, height = 30, anchor ='ne')
             #self.SetTempMinusButton2.place(relx=0, rely=.2, height = 30, anchor ='nw')
         else:
-            self.fermMeter.place(relx=.5, rely=0, anchor ='n')
+            self.tempLabel.place(relx=.5, rely=0, anchor ='n')
             self.setTempLabel.place(relx=.5, rely=.45, anchor='n')
 
             self.offButton.place(relx=.5, rely=.85, anchor ='n')
@@ -220,7 +221,7 @@ class Fermentation(threading.Thread):
         def colorConfigure(state):
                 self.theme = state
                 self.labelFrame.configure(bootstyle =self.theme)
-                self.fermMeter.configure(bootstyle =self.theme)
+                self.tempLabel.configure(bootstyle =self.theme)
                 self.setTempLabel.configure(bootstyle =self.theme)
                 self.serveButton.configure(bootstyle =self.theme + "outline-toolbutton")
                 self.offButton.configure(bootstyle =self.theme + "outline-toolbutton")
@@ -230,13 +231,14 @@ class Fermentation(threading.Thread):
                 self.SetTempMinusButton.configure(bootstyle =self.theme + "outline-toolbutton")
         #Below code delays 10 seconds before reading the temp value
         sleep(10)
+        tempFlag = True
+        #self.temp = 68
         while True:
 
-
             self.temp = read_temp(self.tempAddress)
-            self.fermMeter['text']= str(self.temp) + u"\N{DEGREE SIGN}"
+            self.tempLabel['text']= str(self.temp) + u"\N{DEGREE SIGN}"
             self.setTempLabel['text']= text = "SET TEMP:   " + str(self.setTemp) + u"\N{DEGREE SIGN}"
-            sleep(1)
+            sleep(.5)
 
             if self.mode == "ON":
                 if self.temp > self.setTemp:
@@ -244,14 +246,26 @@ class Fermentation(threading.Thread):
                     relayOn(self.valveBoard, self.valveChannel)
                     tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                     colorConfigure("primary")
+                    tempFlag = True
 
+                elif self.temp > (self.setTemp-self.hys) and tempFlag:
+                    self.valveState = True
+                    relayOn(self.valveBoard, self.valveChannel)
+                    tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
+                    colorConfigure("primary")
 
-                elif self.temp <= (self.setTemp -2):
+                elif self.temp <= (self.setTemp -self.hys):
                     self.valveState = False
                     relayOff(self.valveBoard, self.valveChannel)
                     tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                     colorConfigure("danger")
+                    tempFlag = False
 
+                elif self.temp > (self.setTemp- self.hys) and tempFlag == False:
+                    self.valveState = False
+                    relayOff(self.valveBoard, self.valveChannel)
+                    tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
+                    colorConfigure("success")
 
                 else:
                     self.valveState = False
