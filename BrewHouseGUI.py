@@ -15,7 +15,7 @@ print(tankInfo)
 
 
 # root window
-root = ttk.Window("Brew", "superhero",resizable=(False, False))
+root = ttk.Window("Brew", "superhero",resizable=(True, True))
 root.geometry('800x600') #1280x1024
 
 # create a notebook
