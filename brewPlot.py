@@ -4,11 +4,14 @@ from random import randint
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.style
 import matplotlib as mpl
+import matplotlib.dates as dates
 from matplotlib.figure import Figure
 import time
 import threading
 import pandas as pd
 from datetime import datetime
+from scipy.interpolate import make_interp_spline, BSpline
+import numpy as np
 
 mpl.style.use('dark_background')
 
@@ -26,9 +29,9 @@ class BrewPlotting(threading.Thread):
         self.graph.get_tk_widget().pack(side="top",fill='both',expand=True)
 
     def plotFormat(self):
-        self.ax.set_xlabel("X axis")
-        self.ax.set_ylabel("Y axis")
-        self.ax.set_title("show a titellllll")
+        #self.ax.set_xlabel("Time")
+        self.ax.set_ylabel("Temperature in F")
+        self.ax.set_title("Tank Temperate Plotting")
         self.ax.set_facecolor("#354050")
 
         #self.ax.grid()
@@ -37,18 +40,17 @@ class BrewPlotting(threading.Thread):
         try:
             tempInfo = pd.read_csv('tempInfo.csv')
         except:
-            tempInfo = pd.DataFrame(columns = ["Tank","Temperature","Time"])
-            tempInfo.to_csv('tempInfo.csv')
+            data = {"Tank":["FV1"],"Temperature":[0],"Time":[0]}
+            tempInfo = pd.DataFrame.from_dict(data)
+            tempInfo.to_csv('tempInfo.csv',index=False)
 
-        x = []
-        y = []
 
         time = str(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         temp = randint(0, 10)
-
-
-
-        tempInfo.to_csv('tempInfo.csv')
+        tempInfo.loc[len(tempInfo.index)]=["FV1",temp,time]
+        #Limits the length of the data frame to 100 readings
+        tempInfo=tempInfo.iloc[-100:]
+        tempInfo.to_csv('tempInfo.csv', index=False)
 
 
 
@@ -58,9 +60,16 @@ class BrewPlotting(threading.Thread):
             self.ax.cla()
             self.plotFormat()
             dpts = pd.read_csv('tempInfo.csv')
-            self.ax.plot(dpts["Time"],dpts["Temperature"], marker='o', color='orange')
+
+            x,y=dpts["Time"][-10:],dpts["Temperature"][-10:]
+
+
+            self.ax.stackplot(dpts["Time"][-10:],dpts["Temperature"][-10:])
+            #self.ax.xaxis.set_major_formatter(dates.DateFormatter('%Y-%m'))
+            self.fig.autofmt_xdate()
             self.graph.draw()
             time.sleep(1)
+
 
 if __name__ == '__main__':
     def app():
@@ -77,9 +86,3 @@ if __name__ == '__main__':
 
 
     app()
-
-
-# x_data.append(new_x)
-# y_data.append(new_y)
-# x_data = x_data[1:]
-# Y_data = y_data[1:]
