@@ -137,7 +137,7 @@ class Fermentation(threading.Thread):
                             variable=self.v,
                             command = serve,
                             value=500,
-                            width = 42)
+                            width = 30)
 
         def nameOff():
             self.mode = "OFF"
@@ -151,7 +151,7 @@ class Fermentation(threading.Thread):
                             variable=self.v,
                             command = nameOff,
                             value = 300,
-                            width =42)
+                            width =30)
         def increaseSet():
             self.setTemp += 1
             writeSetTemp()
