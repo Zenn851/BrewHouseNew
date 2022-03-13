@@ -23,7 +23,10 @@ windowWidth = 1280
 # root window
 root = ttk.Window("Laneside Brewing", "superhero",resizable=(True,True))
 root.geometry(str(windowWidth)+"x"+str(windowHeight)) #1280x1024, 800x600
-root.iconbitmap(r'assets\Untitled.ico')
+try:
+    root.iconbitmap(r'assets\Untitled.ico')
+except:
+    pass
 # create a notebook
 notebook = ttk.Notebook(root)
 notebook.pack(pady=0, expand=True)
