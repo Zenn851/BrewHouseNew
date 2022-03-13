@@ -57,8 +57,8 @@ class Fermentation(threading.Thread):
                                         frame,
                                         bootstyle=self.theme,
                                         text = str(self.name),
-                                        height= 200,
-                                        width = 200,
+                                        height= 300,
+                                        width = 300,
                                         borderwidth=10
                                          )
 
@@ -66,7 +66,7 @@ class Fermentation(threading.Thread):
                                     self.labelFrame,
                                     text = str(self.temp) + u"\N{DEGREE SIGN}",
                                     borderwidth = 5,
-                                    font=("Helvetica", 30, 'bold'),
+                                    font=("Helvetica", 50, 'bold'),
                                     bootstyle=self.theme
                                     )
 
@@ -74,7 +74,7 @@ class Fermentation(threading.Thread):
                                     self.labelFrame,
                                     text = "SET TEMP:   " + str(self.setTemp) + u"\N{DEGREE SIGN}",
                                     borderwidth = 5,
-                                    font=("Helvetica", 10, 'bold'),
+                                    font=("Helvetica", 15, 'bold'),
                                     bootstyle=self.theme
                                     )
 
@@ -85,6 +85,13 @@ class Fermentation(threading.Thread):
                     df.at[i, 'Mode'] = self.mode
                     df.at[i,'SetTemp'] = self.setTemp
                     df.at[i,'State'] = state
+                    df.to_csv('tankInfo.csv')
+
+        def writeSetTemp():
+            df= pd.read_csv('tankInfo.csv',index_col=0)
+            for i in df.index:
+                if i == self.name:
+                    df.at[i,'SetTemp'] = self.setTemp
                     df.to_csv('tankInfo.csv')
 
 
@@ -102,7 +109,7 @@ class Fermentation(threading.Thread):
                             variable=self.v,
                             command = nameCrash,
                             value = 100,
-                            width = 7)
+                            width = 15)
 
         def ferm():
             self.mode = "ON"
@@ -116,7 +123,7 @@ class Fermentation(threading.Thread):
                             variable=self.v,
                             command = ferm,
                             value=400,
-                            width = 7)
+                            width = 15)
 
         def serve():
             self.mode = "ON"
@@ -130,7 +137,7 @@ class Fermentation(threading.Thread):
                             variable=self.v,
                             command = serve,
                             value=500,
-                            width = 17)
+                            width = 42)
 
         def nameOff():
             self.mode = "OFF"
@@ -144,9 +151,10 @@ class Fermentation(threading.Thread):
                             variable=self.v,
                             command = nameOff,
                             value = 300,
-                            width = 17)
+                            width =42)
         def increaseSet():
             self.setTemp += 1
+            writeSetTemp()
             #tprint(str(self.name) + "Set Temperature Increased to: " + str(self.setTemp))
 
         self.SetTempPlusButton = ttk.Button(self.labelFrame,
@@ -158,6 +166,7 @@ class Fermentation(threading.Thread):
                                     )
         def decreaseSet():
             self.setTemp -= 1
+            writeSetTemp()
             #tprint(str(self.name) + "Set Temperature Decreased to: " + str(self.setTemp))
 
         self.SetTempMinusButton =ttk.Button(self.labelFrame,
@@ -201,9 +210,9 @@ class Fermentation(threading.Thread):
             self.tempLabel.place(relx=.5, rely=0, anchor ='n')
             self.setTempLabel.place(relx=.5, rely=.45, anchor='n')
 
-            self.offButton.place(relx=.5, rely=.85, anchor ='n')
-            self.crashButton.place(relx=.74, rely=.63, anchor ='n')
-            self.fermButton.place(relx=.26, rely=.63, anchor ='n')
+            self.offButton.place(relx=.5, rely=.83, height = 50, anchor ='n')
+            self.crashButton.place(relx=.74, rely=.63,height = 50, anchor ='n')
+            self.fermButton.place(relx=.26, rely=.63,height = 50, anchor ='n')
 
             self.SetTempPlusButton.place(relx=1, rely=.4, height = 30, anchor ='ne')
             self.SetTempMinusButton.place(relx=0, rely=.4, height = 30, anchor ='nw')
@@ -213,8 +222,8 @@ class Fermentation(threading.Thread):
             self.tempLabel.place(relx=.5, rely=0, anchor ='n')
             self.setTempLabel.place(relx=.5, rely=.45, anchor='n')
 
-            self.offButton.place(relx=.5, rely=.85, anchor ='n')
-            self.serveButton.place(relx=.5, rely=.63, anchor ='n')
+            self.offButton.place(relx=.5, rely=.83, height = 50, anchor ='n')
+            self.serveButton.place(relx=.5, rely=.63, height = 50, anchor ='n')
 
             self.SetTempPlusButton.place(relx=1, rely=.4, height = 30, anchor ='ne')
             self.SetTempMinusButton.place(relx=0, rely=.4, height = 30, anchor ='nw')

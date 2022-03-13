@@ -18,20 +18,21 @@ except:
 
 print(tankInfo)
 
-
+windowHeight =1024
+windowWidth = 1280
 # root window
-root = ttk.Window("Brew", "superhero",resizable=(False,False))
-root.geometry('800x600') #1280x1024
-
+root = ttk.Window("Laneside Brewing", "superhero",resizable=(True,True))
+root.geometry(str(windowWidth)+"x"+str(windowHeight)) #1280x1024, 800x600
+root.iconbitmap(r'assets\Untitled.ico')
 # create a notebook
 notebook = ttk.Notebook(root)
 notebook.pack(pady=0, expand=True)
 
 # create frames
-frame1 = ttk.Frame(notebook, width=800, height=580)
-frame2 = ttk.Frame(notebook, width=800, height=580)
-frame3 = ttk.Frame(notebook, width=800, height=580)
-frame4 = ttk.Frame(notebook, width=800, height=580)
+frame1 = ttk.Frame(notebook, width=windowWidth, height=windowHeight-20)
+frame2 = ttk.Frame(notebook, width=windowWidth, height=windowHeight-20)
+frame3 = ttk.Frame(notebook, width=windowWidth, height=windowHeight-20)
+frame4 = ttk.Frame(notebook, width=windowWidth, height=windowHeight-20)
 
 #pack
 frame1.pack(fill='both', expand=True)
