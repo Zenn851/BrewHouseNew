@@ -91,10 +91,10 @@ def getKettletemp():
 def getMashtemp():
     return RTD.get(RTD_board, MLT_RTD)
 
-def getHEXtemp():
+def getHEXOutputTemp():
     return RTD.get(RTD_board, HEX_RTD)
 
-def getH2Otemp():
+def getHEXH2Otemp():
     return RTD.get(RTD_board, H2O_RTD)
 
 
