@@ -71,7 +71,8 @@ def tankCreator(df):
                                 valveChannel = int(row['ValveChannel']),
                                 setTemp = row['SetTemp'],
                                 class1 = row["Type"],
-                                mode = row['Mode'])
+                                mode = row['Mode'],
+                                hys = row['Hys'])
             index.setDaemon(True)
             thread += 1
             if col1 < 3:
@@ -95,7 +96,8 @@ def tankCreator(df):
                                 valveChannel = int(row['ValveChannel']),
                                 setTemp = row['SetTemp'],
                                 class1 = row["Type"],
-                                mode = row['Mode'])
+                                mode = row['Mode'],
+                                hys = row['Hys'])
             index.setDaemon(True)
             index.start()
             thread += 1

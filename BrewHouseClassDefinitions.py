@@ -237,6 +237,7 @@ class Fermentation(threading.Thread):
         print("Valve Solenoid Board/Relay: " + str(self.valveBoard) + ", " + str(self.valveChannel))
         print("Previous Set Temperate: "+ str(self.setTemp))
         print("Mode Initialized to : "+ self.mode)
+        print("Hysteresis Set Point: "+str(self.hys))
         def colorConfigure(state):
                 self.theme = state
                 self.labelFrame.configure(bootstyle =self.theme)
