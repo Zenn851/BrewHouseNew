@@ -41,6 +41,7 @@ class Fermentation(threading.Thread):
         self.theme = "secondary"
         self.class1 = class1
         self.hys = hys
+        self.frame = frame
 
 
         #for the radio buttons to function
@@ -54,7 +55,7 @@ class Fermentation(threading.Thread):
         #self.v.set(300)
 
         self.labelFrame = ttk.Labelframe(
-                                        frame,
+                                        self.frame,
                                         bootstyle=self.theme,
                                         text = str(self.name),
                                         height= 300,
@@ -216,8 +217,10 @@ class Fermentation(threading.Thread):
 
             self.SetTempPlusButton.place(relx=1, rely=.4, height = 30, anchor ='ne')
             self.SetTempMinusButton.place(relx=0, rely=.4, height = 30, anchor ='nw')
+            #########DEBUG##############
             #self.SetTempPlusButton2.place(relx=1, rely=.2, height = 30, anchor ='ne')
             #self.SetTempMinusButton2.place(relx=0, rely=.2, height = 30, anchor ='nw')
+            ##############################
         else:
             self.tempLabel.place(relx=.5, rely=0, anchor ='n')
             self.setTempLabel.place(relx=.5, rely=.45, anchor='n')
@@ -252,6 +255,9 @@ class Fermentation(threading.Thread):
         #Below code delays 10 seconds before reading the temp value
         sleep(10)
         tempFlag = True
+        #Debug Remove#######
+        #self.temp = 33
+        #################
         while True:
 
             self.temp = read_temp(self.tempAddress)
@@ -291,6 +297,7 @@ class Fermentation(threading.Thread):
                     relayOff(self.valveBoard, self.valveChannel)
                     #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                     colorConfigure("success")
+                    tempFlag = False
 
 
             elif self.mode == "OFF":
@@ -298,11 +305,253 @@ class Fermentation(threading.Thread):
                 relayOff(self.valveBoard, self.valveChannel)
                 #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                 colorConfigure("secondary")
+                tempFlag = False
 
 
             else:
                 tprint("not working")
+                tempFlag = False
 
+
+
+##############################
+##############################
+
+class BoilKettle(threading.Thread):
+    """
+    Simple simulation of a water boiler which can heat up water
+    and where the heat dissipates slowly over time
+    """
+    def __init__(self,name="Kettle",threadID=55,frame="frame1", tempAddress="28-0721705c2caa",valveBoard=3, valveChannel=1,setTemp = None, mode = "OFF", hys = 2):
+
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.name = name
+        self.setTemp = setTemp
+        self.valveState = False
+        self.mode = mode
+        self.tempAddress = tempAddress
+        self.temp = read_temp(self.tempAddress)
+        self.valveBoard = valveBoard
+        self.valveChannel = valveChannel
+        self.theme = "info"
+        #self.class1 = class1
+        self.hys = hys
+
+
+        #######Radio Buttons: Off:100, Man:200, Auto: 300
+        self.v = ttk.IntVar()
+        self.v.set(100)
+
+        self.labelFrame = ttk.Labelframe(
+                                        frame,
+                                        bootstyle=self.theme,
+                                        text = self.name,
+                                        height= 600,
+                                        width = 300,
+                                        borderwidth=10
+                                        )
+        self.tempLabel = ttk.Label(
+                                    self.labelFrame,
+                                    text = str(self.temp) + u"\N{DEGREE SIGN}",
+                                    borderwidth = 5,
+                                    font=("Helvetica", 50, 'bold'),
+                                    bootstyle=self.theme
+                                    )
+
+        self.setTempLabel = ttk.Label(
+                                    self.labelFrame,
+                                    text = "SET TEMP:   " + str(self.setTemp) + u"\N{DEGREE SIGN}",
+                                    borderwidth = 5,
+                                    font=("Helvetica", 15, 'bold'),
+                                    bootstyle=self.theme
+                                    )
+
+        def nameOff():
+            self.mode = "OFF"
+            self.setTemp = None
+
+
+        self.offButton = ttk.Radiobutton(
+                            self.labelFrame,
+                            text="OFF",
+                            bootstyle=self.theme + "outline-toolbutton",
+                            variable=self.v,
+                            command = nameOff,
+                            value = 100,
+                            width = 10)
+        def nameMan():
+            self.mode = "Man"
+            self.setTemp = 100
+
+
+        self.manButton = ttk.Radiobutton(
+                            self.labelFrame,
+                            text="MAN",
+                            bootstyle=self.theme + "outline-toolbutton",
+                            variable=self.v,
+                            command = nameMan,
+                            value = 200,
+                            width = 10)
+        def nameAuto():
+            self.mode = "Auto"
+            self.setTemp = 212
+
+
+        self.autoButton = ttk.Radiobutton(
+                            self.labelFrame,
+                            text="AUTO",
+                            bootstyle=self.theme + "outline-toolbutton",
+                            variable=self.v,
+                            command = nameAuto,
+                            value = 300,
+                            width = 10)
+
+        def increaseSet():
+            self.setTemp += 1
+            #writeSetTemp()
+            #tprint(str(self.name) + "Set Temperature Increased to: " + str(self.setTemp))
+
+        self.SetTempPlusButton = ttk.Button(self.labelFrame,
+                                    text="+",
+                                    bootstyle=self.theme + "outline-toolbutton",
+                                    command= increaseSet,
+                                    width = 3,
+                                    padding =3
+                                    )
+        def decreaseSet():
+            self.setTemp -= 1
+            #writeSetTemp()
+            #tprint(str(self.name) + "Set Temperature Decreased to: " + str(self.setTemp))
+
+        self.SetTempMinusButton =ttk.Button(self.labelFrame,
+                                    text="-",
+                                    bootstyle=self.theme + "outline-toolbutton",
+                                    command= decreaseSet,
+                                    width = 3,
+                                    padding = 3
+                                    )
+
+
+        self.tempLabel.place(relx=.5, rely=0, anchor ='n')
+        self.setTempLabel.place(relx=.5, rely=.15, anchor='n')
+
+        self.offButton.place(relx=.3, rely=.30, height = 50, anchor ='ne')
+        self.manButton.place(relx=.50, rely=.30,height = 50, anchor ='n')
+        self.autoButton.place(relx= 1, rely=.30,height = 50, anchor ='ne')
+
+        self.SetTempPlusButton.place(relx=1, rely=.15, height = 30, anchor ='ne')
+        self.SetTempMinusButton.place(relx=0, rely=.15, height = 30, anchor ='nw')
+
+    def run(self):
+        print ("Run Fermentation Class Thread:  "  + self.name)
+
+
+        while True:
+            print("Running"+ self.name +": " + self.mode)
+
+            self.temp = read_temp(self.tempAddress)
+            self.tempLabel['text']= str(self.temp) + u"\N{DEGREE SIGN}"
+            self.setTempLabel['text']= text = "SET TEMP:   " + str(self.setTemp) + u"\N{DEGREE SIGN}"
+            sleep(1)
+
+
+class MashTon(BoilKettle):
+    def __init__(self,name="Mash Ton",
+                threadID=55,frame="frame1",
+                tempAddress="28-0721705c2caa",
+                valveBoard=3,
+                valveChannel=1,
+                setTemp = None,
+                mode = "OFF",
+                hys = 2):
+            super().__init__(name,threadID,frame, tempAddress, valveBoard,valveChannel,setTemp,mode,hys)
+
+class HotLiquorTank(BoilKettle):
+    def __init__(self,name="HLT",
+                threadID=55,frame="frame1",
+                tempAddress="28-0721705c2caa",
+                valveBoard=3,
+                valveChannel=1,
+                setTemp = None,
+                mode = "OFF",
+                hys = 2):
+            super().__init__(name,threadID,frame, tempAddress, valveBoard,valveChannel,setTemp,mode,hys)
+
+class PumpControl():
+    def __init__(self,
+                name="Pump",
+                frame = "Frame1"):
+        self.name = name
+        self.theme = "primary"
+        self.labelFrame = ttk.Labelframe(
+                                        frame,
+                                        bootstyle=self.theme,
+                                        text = self.name,
+                                        height= 150,
+                                        width = 300,
+                                        borderwidth=10
+                                        )
+
+class HeatExchange():
+    def __init__(
+                    self,
+                    name,
+                    frame,
+                    tempAddress1="28-0721705c2caa",
+                    tempAddress2="28-0721705c2caa"):
+
+        self.name = name
+        self.theme = "light"
+        self.tempAddress1 = tempAddress1
+        self.temp1 = read_temp(self.tempAddress1)
+        self.tempAddress2 = tempAddress2
+        self.temp2 = read_temp(self.tempAddress2)
+        self.labelFrame = ttk.Labelframe(
+                                        frame,
+                                        bootstyle = self.theme,
+                                        text = self.name,
+                                        height = 250,
+                                        width = 300,
+                                        borderwidth=1,
+                                        )
+
+
+        self.workOutLabel = ttk.Label(
+                                    self.labelFrame,
+                                    text = "WORK OUT",
+                                    borderwidth = 5,
+                                    font=("Helvetica", 15, 'bold'),
+                                    bootstyle=self.theme
+                                    )
+
+        self.workTempLabel = ttk.Label(
+                                    self.labelFrame,
+                                    text = str(self.temp1) + u"\N{DEGREE SIGN}",
+                                    borderwidth = 5,
+                                    font=("Helvetica", 30, 'bold'),
+                                    bootstyle=self.theme
+                                    )
+        self.coolingLabel = ttk.Label(
+                                    self.labelFrame,
+                                    text = "COOLING WATER OUT",
+                                    borderwidth = 5,
+                                    font=("Helvetica", 15, 'bold'),
+                                    bootstyle=self.theme
+                                    )
+
+        self.coolingTempLabel = ttk.Label(
+                                    self.labelFrame,
+                                    text = str(self.temp2) + u"\N{DEGREE SIGN}",
+                                    borderwidth = 5,
+                                    font=("Helvetica", 30, 'bold'),
+                                    bootstyle=self.theme
+                                    )
+
+        self.workOutLabel.place(relx=.5, rely=0, anchor ='n')
+        self.workTempLabel.place(relx=.5, rely=.10, anchor ='n')
+        self.coolingLabel.place(relx=.5, rely=.5, anchor ='n')
+        self.coolingTempLabel.place(relx=.5, rely=.6, anchor='n')
 
 
 ##############################

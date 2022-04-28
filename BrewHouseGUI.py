@@ -29,16 +29,16 @@ except:
     pass
 # create a notebook
 notebook = ttk.Notebook(root)
-notebook.pack(pady=0, expand=True)
+notebook.pack()
 
 # create frames
-frame1 = ttk.Frame(notebook, width=windowWidth, height=windowHeight-20)
-frame2 = ttk.Frame(notebook, width=windowWidth, height=windowHeight-20)
-frame3 = ttk.Frame(notebook, width=windowWidth, height=windowHeight-20)
-frame4 = ttk.Frame(notebook, width=windowWidth, height=windowHeight-20)
+#frame1 = ttk.Frame(notebook, width=windowWidth, height=windowHeight)
+frame2 = ttk.Frame(notebook, width=windowWidth, height=windowHeight)
+frame3 = ttk.Frame(notebook, width=windowWidth, height=windowHeight)
+frame4 = ttk.Frame(notebook, width=windowWidth, height=windowHeight)
 
 #pack
-frame1.pack(fill='both', expand=True)
+#frame1.pack(fill='both', expand=True)
 frame2.pack(fill='both', expand=True)
 frame3.pack(fill='both', expand=True)
 frame4.pack(fill='both', expand=True)
@@ -48,7 +48,7 @@ frame4.pack(fill='both', expand=True)
 notebook.add(frame2, text='Fermentation Tanks')
 notebook.add(frame3, text='Serving Tanks')
 notebook.add(frame4, text='Debug')
-notebook.add(frame1, text='Brewhouse')
+#notebook.add(frame1, text='Brewhouse')
 
 ###########################################
 ####Fermentation/ServingTanks#############################
