@@ -322,7 +322,16 @@ class BoilKettle(threading.Thread):
     Simple simulation of a water boiler which can heat up water
     and where the heat dissipates slowly over time
     """
-    def __init__(self,name="Kettle",threadID=55,frame="frame1", tempAddress="28-0721705c2caa",valveBoard=3, valveChannel=1,setTemp = None, mode = "OFF", hys = 2):
+    def __init__(self,  name="Kettle",
+                        threadID=55,
+                        frame="frame1",
+                        tempAddress="28-0721705c2caa",
+                        valveBoard=3,
+                        valveChannel=1,
+                        setTemp = None,
+                        mode = "OFF",
+                        hys = 2,
+                        auto = 212):
 
         threading.Thread.__init__(self)
         self.threadID = threadID
@@ -335,8 +344,8 @@ class BoilKettle(threading.Thread):
         self.valveBoard = valveBoard
         self.valveChannel = valveChannel
         self.theme = "info"
-        #self.class1 = class1
         self.hys = hys
+        self.auto = auto
 
 
         #######Radio Buttons: Off:100, Man:200, Auto: 300
@@ -380,9 +389,9 @@ class BoilKettle(threading.Thread):
                             command = nameOff,
                             value = 100,
                             width = 10)
-        def nameMan():
+        def nameMan(x=self.auto):
             self.mode = "Man"
-            self.setTemp = 100
+            self.setTemp = x
 
 
         self.manButton = ttk.Radiobutton(
@@ -393,9 +402,9 @@ class BoilKettle(threading.Thread):
                             command = nameMan,
                             value = 200,
                             width = 10)
-        def nameAuto():
+        def nameAuto(x=self.auto):
             self.mode = "Auto"
-            self.setTemp = 212
+            self.setTemp = x
 
 
         self.autoButton = ttk.Radiobutton(
@@ -464,8 +473,46 @@ class MashTon(BoilKettle):
                 valveChannel=1,
                 setTemp = None,
                 mode = "OFF",
-                hys = 2):
-            super().__init__(name,threadID,frame, tempAddress, valveBoard,valveChannel,setTemp,mode,hys)
+                hys = 2,
+                auto= 155):
+            super().__init__(name,threadID,frame, tempAddress, valveBoard,valveChannel,setTemp,mode,hys,auto)
+            self.theme = "success"
+            self.light = ttk.StringVar()
+            self.lightButton = ttk.Checkbutton(
+                                        self.labelFrame,
+                                        text = "LIGHT",
+                                        bootstyle=self.theme+"outline-toolbutton",
+                                        variable= self.light,
+                                        onvalue = "ON",
+                                        offvalue = "OFF",
+                                        width = 40
+                                        )
+
+            self.strike = ttk.StringVar()
+            self.strikeButton = ttk.Checkbutton(
+                                        self.labelFrame,
+                                        text = "STRIKE/SPRAGE",
+                                        bootstyle=self.theme+"outline-toolbutton",
+                                        variable= self.strike,
+                                        onvalue = "ON",
+                                        offvalue = "OFF",
+                                        width = 40
+                                        )
+
+            self.grant = ttk.StringVar()
+            self.grantButton = ttk.Checkbutton(
+                                        self.labelFrame,
+                                        text = "GRANT ENABLE",
+                                        bootstyle=self.theme+"outline-toolbutton",
+                                        variable= self.grant,
+                                        onvalue = "ON",
+                                        offvalue = "OFF",
+                                        width = 40
+                                        )
+
+            self.lightButton.place(relx=.50, rely=.50,height = 50, anchor ='n')
+            self.strikeButton.place(relx=.50, rely=.65,height = 50, anchor ='n')
+            self.grantButton.place(relx=.50, rely=.80,height = 50, anchor ='n')
 
 class HotLiquorTank(BoilKettle):
     def __init__(self,name="HLT",
@@ -475,23 +522,146 @@ class HotLiquorTank(BoilKettle):
                 valveChannel=1,
                 setTemp = None,
                 mode = "OFF",
-                hys = 2):
-            super().__init__(name,threadID,frame, tempAddress, valveBoard,valveChannel,setTemp,mode,hys)
+                hys = 2,
+                auto=170):
+            super().__init__(name,threadID,frame, tempAddress, valveBoard,valveChannel,setTemp,mode,hys,auto)
+            self.roState = False
+            self.cityState = False
 
-class PumpControl():
+            def robutton():
+                self.roState = not(self.roState)
+                print(self.roState)
+                if self.roState:
+                    #add function to perfrom
+                    self.roButton.configure(bootstyle = "success")
+                else:
+                    #stop function
+                    self.roButton.configure(bootstyle = "success-outline")
+
+
+            self.roButton = ttk.Button(
+                                        self.labelFrame,
+                                        bootstyle="success-outline",
+                                        text = "R.O. FILL",
+                                        width = 40,
+                                        command = robutton
+                                        )
+            def cityButton():
+                self.cityState = not(self.cityState)
+                print(self.cityState)
+                if self.cityState:
+                    #add function to perfrom
+                    self.cityButton.configure(bootstyle = "success")
+                else:
+                    #stop function
+                    self.cityButton.configure(bootstyle = "success-outline")
+
+
+            self.cityButton = ttk.Button(
+                                        self.labelFrame,
+                                        bootstyle="success-outline",
+                                        text = "CITY FILL",
+                                        width = 40,
+                                        command = cityButton
+                                        )
+
+            self.flood = ttk.Floodgauge(
+                                        self.labelFrame,
+                                        bootstyle="success",
+                                        text = "Pumping",
+                                        length = 250,
+                                        maximum = 100,
+                                        value = 10
+                                        )
+            self.scale = ttk.Scale(
+                                    self.labelFrame,
+                                    bootstyle="info"
+                                    )
+
+
+            self.roButton.place(relx=.50, rely=.50,height = 50, anchor ='n')
+            self.cityButton.place(relx=.50, rely=.65,height = 50, anchor ='n')
+            self.flood.place(relx=.50, rely=.80,height = 50, anchor ='n')
+            #self.scale.place(relx=.50, rely=.85,height = 50, anchor ='n')
+
+class PumpControl(threading.Thread):
     def __init__(self,
                 name="Pump",
-                frame = "Frame1"):
+                frame = "Frame1",
+                threadID = None,
+                mode = "ON",
+                power = 0):
+
+        threading.Thread.__init__(self)
         self.name = name
+        self.frame=frame
+        self.threadID = threadID
+        self.mode = mode
+        self.power= power
         self.theme = "primary"
+
+
         self.labelFrame = ttk.Labelframe(
-                                        frame,
+                                        self.frame,
                                         bootstyle=self.theme,
                                         text = self.name,
                                         height= 150,
                                         width = 300,
                                         borderwidth=10
-                                        )
+                                            )
+
+
+        self.slider = ttk.Scale(
+                                self.labelFrame,
+                                bootstyle="info",
+                                from_=0,
+                                to=100,
+                                value =25,
+                                length = 250
+                                )
+
+
+
+        self.setPowerLabel = ttk.Label(
+                                    self.labelFrame,
+                                    text = "OFF",
+                                    borderwidth = 5,
+                                    font=("Helvetica", 20, 'bold'),
+                                    bootstyle=self.theme
+                                    )
+
+        self.var10 = ttk.StringVar()
+
+        self.toggleButton = ttk.Checkbutton(
+                                    self.labelFrame,
+                                    text = "OFF/ON",
+                                    bootstyle=self.theme+"-square-toggle",
+                                    variable= self.var10,
+                                    onvalue = "ON",
+                                    offvalue = "OFF"
+                                    )
+
+
+        self.slider.place(relx=.50, rely=.60,height = 50, anchor ='n')
+        self.setPowerLabel.place(relx=.50, rely=.30,height = 50, anchor ='n')
+        self.toggleButton.place(relx=.50, rely=0.3,height = 50, anchor ='s')
+
+    def run(self):
+        print ("Run Pump Class Thread:  "  + self.name)
+
+
+        while True:
+            print("Running"+ self.name +": " + str(self.mode))
+            sleep(1)
+            self.mode = self.var10.get()
+            if self.mode == "ON":
+                self.power=int(self.slider.get())
+                print(self.power)
+                self.setPowerLabel['text']= str(int(self.slider.get())) + "% Pump Speed"
+            elif self.mode == "OFF":
+                self.slider.configure(state="diabled")
+                self.setPowerLabel['text']= "Pump Off"
+
 
 class HeatExchange():
     def __init__(

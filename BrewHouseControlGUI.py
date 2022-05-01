@@ -76,16 +76,24 @@ hlt.labelFrame.grid(column = 3, row=0)
 hlt.start()
 
 clt = bh.PumpControl(name ="CLT Pump", frame=frame1)
+clt.setDaemon(True)
 clt.labelFrame.grid(column = 0, row = 1)
+clt.start()
 
-clt = bh.PumpControl(name ="Kettle Pump", frame=frame1)
-clt.labelFrame.grid(column = 1, row = 1)
+ktp = bh.PumpControl(name ="Kettle Pump", frame=frame1)
+ktp.setDaemon(True)
+ktp.labelFrame.grid(column = 1, row = 1)
+ktp.start()
 
-clt = bh.PumpControl(name ="Mash Pump", frame=frame1)
-clt.labelFrame.grid(column = 2, row = 1)
+mtp = bh.PumpControl(name ="Mash Pump", frame=frame1)
+mtp.setDaemon(True)
+mtp.labelFrame.grid(column = 2, row = 1)
+mtp.start()
 
-clt = bh.PumpControl(name ="HLT Pump", frame=frame1)
-clt.labelFrame.grid(column = 3, row = 1)
+htp = bh.PumpControl(name ="HLT Pump", frame=frame1)
+htp.setDaemon(True)
+htp.labelFrame.grid(column = 3, row = 1)
+htp.start()
 
 hex = bh.HeatExchange(name = "HEX", frame = frame1)
 hex.labelFrame.grid(column = 0, row = 0, stick="sw")
@@ -100,8 +108,8 @@ sys.stdout=pl
 
 ################################################
 ####   MAIN LOOP  ##############################
-# def update():
-#    root.after(2000,update)
+#def update():
+    # root.after(500,update)
 # update()
 # ########################################################
 
