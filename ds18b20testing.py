@@ -10,7 +10,7 @@ sensors_map = { sensors[0]: "FV1  = ",
 
 def read_temp(id):
   sensor = "/sys/devices/w1_bus_master1/" + id + "/w1_slave"
-  temp = 125.0 # error value
+  temp = 0.0 # error value
   try:
     f = open(sensor, "r")
     data = f.read()
