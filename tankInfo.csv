@@ -1,7 +1,7 @@
 Name,TempAddress,ValveBoard,ValveChannel,Temp,SetTemp,Time,Mode,Frame,Type,Label,Tank Drop,State,Hys
 FV1,28-09217060ebaa,3,4,,,,OFF,frame2,ferm,1.0,4.0,300,0.2
 FV2,28-072170587aaa,3,3,,,,OFF,frame2,ferm,2.0,3.0,300,0.2
-FV3,28-09217073acaa,3,2,,70.0,,ON,frame2,ferm,3.0,2.0,400,0.2
+FV3,28-09217073acaa,3,2,,69.0,,ON,frame2,ferm,3.0,2.0,400,0.2
 FV4,28-09217063caaa,3,1,,74.0,,ON,frame2,ferm,4.0,1.0,400,0.2
 FV5,28-07217042a7aa,4,5,,34.0,,ON,frame2,ferm,5.0,12.0,100,0.2
 FV6,28-0721704eacaa,4,4,,34.0,,ON,frame2,ferm,6.0,13.0,100,0.2

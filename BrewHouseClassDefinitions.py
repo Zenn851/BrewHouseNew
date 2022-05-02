@@ -260,11 +260,11 @@ class Fermentation(threading.Thread):
             sleep(1)
 
             if self.mode == "ON":
-                if self.temp > self.setTemp:
+                if self.temp > self.setTemp + .5:
                     self.valveState = True
                     relayOn(self.valveBoard, self.valveChannel)
                     #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
-                    colorConfigure("primary")
+                    colorConfigure("danger")
                     tempFlag = True
 
                 elif self.temp > (self.setTemp-self.hys) and tempFlag:
@@ -277,7 +277,7 @@ class Fermentation(threading.Thread):
                     self.valveState = False
                     relayOff(self.valveBoard, self.valveChannel)
                     #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
-                    colorConfigure("danger")
+                    colorConfigure("success")
                     tempFlag = False
 
                 elif self.temp > (self.setTemp- self.hys) and tempFlag == False:
