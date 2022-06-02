@@ -5,6 +5,8 @@ import ttkbootstrap as ttk
 from time import sleep, perf_counter
 import threading
 import pandas as pd
+#import thingsIO as th
+#from random import randint
 
 
 from ds18b20testing import read_temp
@@ -41,6 +43,11 @@ class Fermentation(threading.Thread):
         self.theme = "secondary"
         self.class1 = class1
         self.hys = hys
+        self.running = True
+        self.tempFlag = True
+        self.setDaemon(True)
+        self.start()
+
 
 
         #for the radio buttons to function
@@ -228,356 +235,96 @@ class Fermentation(threading.Thread):
             self.SetTempPlusButton.place(relx=1, rely=.4, height = 30, anchor ='ne')
             self.SetTempMinusButton.place(relx=0, rely=.4, height = 30, anchor ='nw')
 
+    def updateTemp(self):
+        self.temp = read_temp(self.tempAddress)
+        #self.temp = randint(50,80)
+        #print(self.name + "updated temp")
+
+    def colorConfigure(self, state):
+            self.theme = state
+            self.labelFrame.configure(bootstyle =self.theme)
+            self.tempLabel.configure(bootstyle =self.theme)
+            self.setTempLabel.configure(bootstyle =self.theme)
+            self.serveButton.configure(bootstyle =self.theme + "outline-toolbutton")
+            self.offButton.configure(bootstyle =self.theme + "outline-toolbutton")
+            self.fermButton.configure(bootstyle =self.theme + "outline-toolbutton")
+            self.crashButton.configure(bootstyle =self.theme + "outline-toolbutton")
+            self.SetTempPlusButton.configure(bootstyle =self.theme + "outline-toolbutton")
+            self.SetTempMinusButton.configure(bootstyle =self.theme + "outline-toolbutton")
+
+    #Created a function for the main loop
+    def tankTempControl(self):
+        #self.temp = read_temp(self.tempAddress)
+        self.tempLabel['text']= str(self.temp) + u"\N{DEGREE SIGN}"
+        self.setTempLabel['text']= text = "SET TEMP:   " + str(self.setTemp) + u"\N{DEGREE SIGN}"
+
+        if self.mode == "ON":
+            if self.temp > self.setTemp + .5:
+                self.valveState = True
+                relayOn(self.valveBoard, self.valveChannel)
+                #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
+                self.colorConfigure("danger")
+                self.tempFlag = True
+
+            elif self.temp > (self.setTemp-self.hys) and self.tempFlag:
+                self.valveState = True
+                relayOn(self.valveBoard, self.valveChannel)
+                #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
+                self.colorConfigure("primary")
+
+            elif self.temp <= (self.setTemp -self.hys):
+                self.valveState = False
+                relayOff(self.valveBoard, self.valveChannel)
+                #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
+                self.colorConfigure("success")
+                self.tempFlag = False
+
+            elif self.temp > (self.setTemp- self.hys) and self.tempFlag == False:
+                self.valveState = False
+                relayOff(self.valveBoard, self.valveChannel)
+                #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
+                self.colorConfigure("success")
+
+            else:
+                self.valveState = False
+                relayOff(self.valveBoard, self.valveChannel)
+                #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
+                self.colorConfigure("success")
+
+
+        elif self.mode == "OFF":
+            self.valveState = False
+            relayOff(self.valveBoard, self.valveChannel)
+            #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
+            self.colorConfigure("secondary")
+
+
+        else:
+            tprint("not working, mode must be set incorrectly")
 
 
     ######This is the main thread for the class
     def run(self):
+        #Initializing
         print ("Run Fermentation Class Thread:  "  + self.name)
         print("Temperature Sencor Address: " + self.tempAddress)
         print("Valve Solenoid Board/Relay: " + str(self.valveBoard) + ", " + str(self.valveChannel))
         print("Previous Set Temperate: "+ str(self.setTemp))
         print("Mode Initialized to : "+ self.mode)
         print("Hysteresis Set Point: "+str(self.hys))
-        def colorConfigure(state):
-                self.theme = state
-                self.labelFrame.configure(bootstyle =self.theme)
-                self.tempLabel.configure(bootstyle =self.theme)
-                self.setTempLabel.configure(bootstyle =self.theme)
-                self.serveButton.configure(bootstyle =self.theme + "outline-toolbutton")
-                self.offButton.configure(bootstyle =self.theme + "outline-toolbutton")
-                self.fermButton.configure(bootstyle =self.theme + "outline-toolbutton")
-                self.crashButton.configure(bootstyle =self.theme + "outline-toolbutton")
-                self.SetTempPlusButton.configure(bootstyle =self.theme + "outline-toolbutton")
-                self.SetTempMinusButton.configure(bootstyle =self.theme + "outline-toolbutton")
+
         #Below code delays 10 seconds before reading the temp value
-        sleep(10)
-        tempFlag = True
-        while True:
+        sleep(5)
 
-            self.temp = read_temp(self.tempAddress)
-            self.tempLabel['text']= str(self.temp) + u"\N{DEGREE SIGN}"
-            self.setTempLabel['text']= text = "SET TEMP:   " + str(self.setTemp) + u"\N{DEGREE SIGN}"
-            sleep(1)
-
-            if self.mode == "ON":
-                if self.temp > self.setTemp + .5:
-                    self.valveState = True
-                    relayOn(self.valveBoard, self.valveChannel)
-                    #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
-                    colorConfigure("danger")
-                    tempFlag = True
-
-                elif self.temp > (self.setTemp-self.hys) and tempFlag:
-                    self.valveState = True
-                    relayOn(self.valveBoard, self.valveChannel)
-                    #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
-                    colorConfigure("primary")
-
-                elif self.temp <= (self.setTemp -self.hys):
-                    self.valveState = False
-                    relayOff(self.valveBoard, self.valveChannel)
-                    #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
-                    colorConfigure("success")
-                    tempFlag = False
-
-                elif self.temp > (self.setTemp- self.hys) and tempFlag == False:
-                    self.valveState = False
-                    relayOff(self.valveBoard, self.valveChannel)
-                    #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
-                    colorConfigure("success")
-
-                else:
-                    self.valveState = False
-                    relayOff(self.valveBoard, self.valveChannel)
-                    #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
-                    colorConfigure("success")
+        while self.running:
+            sleep(.5)
+            self.tankTempControl()
 
 
-            elif self.mode == "OFF":
-                self.valveState = False
-                relayOff(self.valveBoard, self.valveChannel)
-                #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
-                colorConfigure("secondary")
-
-
-            else:
-                tprint("not working")
-
-
-
-##############################
-##############################
-# class Brewhouse:
-#     """
-#     Simple simulation of a water boiler which can heat up water
-#     and where the heat dissipates slowly over time
-#     """
-#     def __init__(self,name,frame):
-#
-#         self.name = name
-#
-#         self.hltTemp =   None
-#         self.hltSetTemp =   0
-#         self.hltDutyCycle = 0
-#         self.hltFloatSwLow = False
-#         self.hltFloatSwHi = False
-#         self.hltElement = False
-#
-#         self.bkTemp =  None
-#         self.bkSetTemp = 0
-#         self.bkDutyCycle = 0
-#         self.bkFloatSwLo = False
-#         self.bkFloatSwHi = False
-#         self.bkElement = False
-#
-#         self.mashTemp = None
-#         self.mashSetTemp = None
-#
-#         self.exchangeTemp = None
-#
-#
-#         ###Tuple assumes first variable is on/off, second is DutyCycle
-#         ###Possible we could just set DC to 0
-#         self.mainPump = (False, 0)
-#
-#         ###Tuple assumes first variable is on/off, second is DutyCycle
-#         ###Possible we could just set DC to 0
-#         self.spargePump = (False, 0)
-#
-# #############
-#         self.hltMeter = ttk.Meter(
-#                     master=frame,
-#                     metersize= 180,
-#                     padding = 10,
-#                     amountused=self.hltTemp, ###########
-#                     textright='°F',
-#                     amounttotal=212,
-#                     metertype='semi',
-#                     subtext='HLT Temperature', ##############
-#                     bootstyle='danger',
-#                     interactive=False
-#                     )
-#         self.hltSetTempPlusButton = ttk.Button(frame,
-#                                     text="+",
-#                                     bootstyle="danger",
-#                                     command= self.hltPlusTemp,
-#                                     width = 3,
-#                                     padding = 10)
-#
-#         self.hltSetTempMinusButton =ttk.Button(frame,
-#                                     text="-",
-#                                     bootstyle="danger",
-#                                     command= self.hltMinusTemp,
-#                                     width = 3,
-#                                     padding = 10)
-#
-#         self.hltSetTempLabel =  ttk.Label(frame,
-#                                 bootstyle ="inverse-danger",
-#                                 text="SET TEMP:   " +str(self.hltSetTemp)+ u"\N{DEGREE SIGN}" + "F")
-#
-#         self.hltDutyPlusButton =ttk.Button(frame,
-#                                     text="+",
-#                                     bootstyle="danger",
-#                                     command= self.hltPlusDutyCycle,
-#                                     width = 3,
-#                                     padding = 10)
-#
-#         self.hltDutyMinusButton =ttk.Button(frame,
-#                                     text="-",
-#                                     bootstyle="danger",
-#                                     command= self.hltMinusDutyCylce,
-#                                     width = 3,
-#                                     padding = 10)
-#
-#         self.hltDutyLabel =     ttk.Label(frame,
-#                                 text="Duty Cycly:   "
-#                                 +str(self.hltDutyCycle)+"%")
-#
-#         self.bkMeter = ttk.Meter(
-#                     master=frame,
-#                     metersize= 180,
-#                     padding = 10,
-#                     amountused=self.bkTemp, ###########
-#                     textright='°F',
-#                     amounttotal=212,
-#                     metertype='semi',
-#                     subtext='Brew Kettle', ##############
-#                     bootstyle='danger',
-#                     interactive=False
-#                     )
-#         self.bkSetTempPlusButton = ttk.Button(frame,
-#                                     text="+",
-#                                     bootstyle="danger",
-#                                     command= self.bkPlusTemp,
-#                                     width = 3,
-#                                     padding = 10
-#                                     )
-#
-#         self.bkSetTempMinusButton =ttk.Button(frame,
-#                                     text="-",
-#                                     bootstyle="danger",
-#                                     command= self.bkMinusTemp,
-#                                     width = 3,
-#                                     padding = 10
-#                                     )
-#
-#         self.bkSetTempLabel =   ttk.Label(frame,
-#                                 text="SET TEMP:   "
-#                                 +str(self.bkSetTemp)+ u"\N{DEGREE SIGN}" + "F",
-#                                 width = 14,
-#                                 padding = 10,
-#                                 bootstyle ="inverse-danger"
-#                                 )
-#
-#         self.bkDutyPlusButton =ttk.Button(frame,
-#                                     text="+",
-#                                     bootstyle="danger",
-#                                     width = 3,
-#                                     padding = 10,
-#                                     command= self.bkPlusDutyCycle)
-#
-#         self.bkDutyMinusButton =ttk.Button(frame,
-#                                     text="-",
-#                                     bootstyle="danger",
-#                                     width = 3,
-#                                     padding = 10,
-#                                     command= self.bkMinusDutyCylce)
-#
-#         self.bkDutyLabel =      ttk.Label(frame,
-#                                 text="Duty Cycly:   "
-#                                 +str(self.bkDutyCycle)+"%")
-#
-#         self.mashMeter = ttk.Meter(
-#                     master=frame,
-#                     metersize= 180,
-#                     padding = 10,
-#                     amountused=self.mashTemp, ###########
-#                     textright='°F',
-#                     amounttotal=212,
-#                     metertype='semi',
-#                     subtext='Mash Tun', ##############
-#                     bootstyle='danger',
-#                     interactive=False
-#                     )
-#
-#         self.setTempPlus =[]
-#
-#         self.setTempMinus =[]
-# #########################
-#
-#     def mainPumpOn(self, power=50):
-#         if power < 0 or power >100:
-#             tprint("Please Enter a Value between 0 and 100")
-#
-#         else:
-#             self.mainPump = (True, power)
-#             tprint("Main Pump Turned on "+str(power)+"% Power")
-#
-#
-#     def spargePumpOn(self, power = 50):
-#         if power < 0 or power >100:
-#             tprint("Please Enter a Value between 0 and 100")
-#
-#         else:
-#             self.spargePump = (True, power)
-#             tprint("Sparge Pump Turned on "+str(power)+"% Power")
-#
-#     def mashON(self, setTemp = 155):
-#         if brewKettleFloatSw == True:
-#             self.mainPump = (True, 50)
-#             self.mashSetTemp = 155
-#             tprint("Mash tun Circulation on, set temperature: "+str(setTemp))
-#         else:
-#             tprint("Water Not at Temp to Circulate")
-#
-#     def mashOff(self):
-#         self.mainPump = (False, 0)
-#         self.mashSetTemp = 155
-#         tprint("mash tun off")
-#
-#     def boilDutyCycle(self, duty = 80):
-#         if self.bkFloatSwHi == True:
-#             self.bkeElement = True
-#             self.bkDutyCycle = duty
-#             tprint("Brew Kettle on, Duty Cyle: "+ str(duty)+"%")
-#         else:
-#             self.bkElement = False
-#             tprint("Water/Wort Needs to Fill")
-#
-#     #######Set the DutyCyle of the element to 100%
-#     def boilOn(self):
-#         if self.bkFloatSwHi == True:
-#             self.bkeElement = True
-#             self.bkDutyCycle = 100
-#             tprint("Brew Kettle on, Duty Cyle: 100%")
-#         else:
-#             self.bkElement = False
-#             tprint("Water Needs to Fill")
-#
-#     #######Set the DutyCyle of the element to 0%
-#     def boilOff(self):
-#         self.bkElement = False
-#         self.bkDutyCycle = 0
-#         tprint("Brew Kettle Off, Duty Cyle: 0%")
-#
-#     def hltOn(self, setTemp = 180):
-#         if hltFloatSw == True:
-#             hltElement = True
-#             self.hltSetTemp = setTemp
-#             tprint("HLT Temp Set to " + str(setTemp))
-#         else:
-#             print("HLT Tank Needs Water to Start")
-#
-#     def hltOff(self):
-#         hltElement = False
-#         self.hltSetTemp = 0
-#         tprint("HLT Turned Off")
-#
-#     def bkMinusTemp(self):
-#         self.bkSetTemp -=1
-#         tprint("Bew Kettle Temp minus 1")
-#         self.bkSetTempLabel['text']="SET TEMP:   " +str(self.bkSetTemp)+ u"\N{DEGREE SIGN}" + "F"
-#
-#     def bkPlusTemp(self):
-#         self.bkSetTemp +=1
-#         tprint("Brew Kettle Temp Plus 1")
-#         self.bkSetTempLabel['text']="SET TEMP:   " +str(self.bkSetTemp)+ u"\N{DEGREE SIGN}" + "F"
-#
-#     def hltMinusTemp(self):
-#         self.hltSetTemp -=1
-#         tprint("HLT Temp minus 1")
-#         self.hltSetTempLabel['text']="SET TEMP:   " +str(self.hltSetTemp)+ u"\N{DEGREE SIGN}" + "F"
-#
-#     def hltPlusTemp(self):
-#         self.hltSetTemp +=1
-#         tprint("HLT Temp Plus 1")
-#         self.hltSetTempLabel['text']="SET TEMP:   " +str(self.hltSetTemp)+ u"\N{DEGREE SIGN}" + "F"
-#
-#     def bkMinusDutyCylce(self):
-#         self.bkDutyCycle -=1
-#         tprint("Bew Kettle DutyCyle minus 1")
-#         self.bkDutyLabel['text']="DutyCyle:   " +str(self.bkDutyCycle)+  "%"
-#
-#     def bkPlusDutyCycle(self):
-#         self.bkDutyCycle +=1
-#         tprint("Brew Kettle DutyCyle Plus 1")
-#         self.bkDutyLabel['text']="DutyCyle:   " +str(self.bkDutyCycle)+  "%"
-#
-#     def hltMinusDutyCylce(self):
-#         self.hltDutyCycle -=1
-#         tprint("HLT DutyCyle Plus 1%")
-#         self.hltDutyLabel['text']="DutyCyle:   " +str(self.hltDutyCycle)+  "%"
-#
-#     def hltPlusDutyCycle(self):
-#         self.hltDutyCycle +=1
-#         tprint("HLT DutyCyle Plus 1%")
-#         self.hltDutyLabel['text']="DutyCyle:   " +str(self.hltDutyCycle)+  "%"
-#
 
 def tprint(*args):
     stamp = str(datetime.now().strftime('%Y-%m-%d %H:%M:%S \n'))
     print(str(*args) + " : "+stamp)
-
 
 ##############
 ###Example of using the PID control
