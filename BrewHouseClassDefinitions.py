@@ -13,12 +13,13 @@ from ds18b20testing import read_temp
 try:
     from sequentdrivers import relayOn, relayOff
 except:
+    print("Relay libarry not loaded")
     def relayOn(x,y):
         xxx=0
-        #print("valveON")
+        print("valveON")
     def relayOff(x,y):
         xxx=1
-        #print("valveOFF")
+        print("valveOFF")
 
 ##############################
 ##############################
@@ -64,8 +65,8 @@ class Fermentation(threading.Thread):
                                         frame,
                                         bootstyle=self.theme,
                                         text = str(self.name),
-                                        height= 300,
-                                        width = 300,
+                                        # height= 300,
+                                        # width = 300,
                                         borderwidth=10
                                          )
 
@@ -73,7 +74,7 @@ class Fermentation(threading.Thread):
                                     self.labelFrame,
                                     text = str(self.temp) + u"\N{DEGREE SIGN}",
                                     borderwidth = 5,
-                                    font=("Helvetica", 50, 'bold'),
+                                    font=("Helvetica", 70, 'bold'),
                                     bootstyle=self.theme
                                     )
 
@@ -186,59 +187,65 @@ class Fermentation(threading.Thread):
 ############################################################
 ###########################################################
 ############Debug###########################################
-        # def increaseSet2():
-        #     self.temp += 1
-        #     #tprint(str(self.name) + "Temperature Increased to: " + str(self.temp))
-        #
-        # self.SetTempPlusButton2 = ttk.Button(self.labelFrame,
-        #                             text="+",
-        #                             bootstyle=self.theme + "outline-toolbutton",
-        #                             command= increaseSet2,
-        #                             width = 3,
-        #                             padding =3
-        #                             )
-        # def decreaseSet2():
-        #     self.temp -= 1
-        #     #tprint(str(self.name) + "Temperature Decreased to: " + str(self.temp))
-        #
-        # self.SetTempMinusButton2 =ttk.Button(self.labelFrame,
-        #                             text="-",
-        #                             bootstyle=self.theme + "outline-toolbutton",
-        #                             command= decreaseSet2,
-        #                             width = 3,
-        #                             padding = 3
-        #                             )
+        def increaseSet2():
+            self.temp += 1
+            #tprint(str(self.name) + "Temperature Increased to: " + str(self.temp))
+
+        self.SetTempPlusButton2 = ttk.Button(self.labelFrame,
+                                    text="+",
+                                    bootstyle=self.theme + "outline-toolbutton",
+                                    command= increaseSet2,
+                                    width = 3,
+                                    padding =3
+                                    )
+        def decreaseSet2():
+            self.temp -= 1
+            #tprint(str(self.name) + "Temperature Decreased to: " + str(self.temp))
+
+        self.SetTempMinusButton2 =ttk.Button(self.labelFrame,
+                                    text="-",
+                                    bootstyle=self.theme + "outline-toolbutton",
+                                    command= decreaseSet2,
+                                    width = 3,
+                                    padding = 3
+                                    )
 
 
 ################################################
-
+        #frame2.pack(fill='both', expand=True)
+        self.labelFrame.columnconfigure((0,1,2,3), weight = 1)
+        self.labelFrame.rowconfigure(0, weight = 2)
+        self.labelFrame.rowconfigure((1,2,3), weight = 1)
 
         if self.class1 == "ferm":
-            self.tempLabel.place(relx=.5, rely=0, anchor ='n')
-            self.setTempLabel.place(relx=.5, rely=.45, anchor='n')
+            self.tempLabel.grid(row=0,column=1,columnspan=2, sticky="n", padx=2,pady=2)
 
-            self.offButton.place(relx=.5, rely=.83, height = 50, anchor ='n')
-            self.crashButton.place(relx=.74, rely=.63,height = 50, anchor ='n')
-            self.fermButton.place(relx=.26, rely=.63,height = 50, anchor ='n')
+            self.setTempLabel.grid(row=1,column=1, columnspan=2,  sticky="n", padx=2,pady=2)
+            self.SetTempPlusButton.grid(row=1,column=3, sticky="nsew", padx=2,pady=2)
+            self.SetTempMinusButton.grid(row=1,column=0, sticky="nsew", padx=2,pady=2)
 
-            self.SetTempPlusButton.place(relx=1, rely=.4, height = 30, anchor ='ne')
-            self.SetTempMinusButton.place(relx=0, rely=.4, height = 30, anchor ='nw')
-            #self.SetTempPlusButton2.place(relx=1, rely=.2, height = 30, anchor ='ne')
-            #self.SetTempMinusButton2.place(relx=0, rely=.2, height = 30, anchor ='nw')
+            self.crashButton.grid(row=2,column=0, columnspan=2, sticky="nsew", padx=2,pady=2)
+            self.fermButton.grid(row=2,column=2,columnspan=2, sticky="nsew", padx=2,pady=2)
+
+            self.offButton.grid(row=3, columnspan=4, sticky="nsew", padx=2,pady=2)
+            ###########DEBUG TEMP BUTTONS######################
+            # self.SetTempPlusButton2.grid(row=0,column=3, sticky="ew", padx=2,pady=2)
+            # self.SetTempMinusButton2.grid(row=0,column=0, sticky="ew", padx=2,pady=2)
         else:
-            self.tempLabel.place(relx=.5, rely=0, anchor ='n')
-            self.setTempLabel.place(relx=.5, rely=.45, anchor='n')
+            self.tempLabel.grid(row=0,column=1,columnspan=2, sticky="n", padx=2,pady=2)
 
-            self.offButton.place(relx=.5, rely=.83, height = 50, anchor ='n')
-            self.serveButton.place(relx=.5, rely=.63, height = 50, anchor ='n')
+            self.setTempLabel.grid(row=1,column=1, columnspan=2,  sticky="n", padx=2,pady=2)
+            self.SetTempPlusButton.grid(row=1,column=3, sticky="nsew", padx=2,pady=2)
+            self.SetTempMinusButton.grid(row=1,column=0, sticky="nsew", padx=2,pady=2)
 
-            self.SetTempPlusButton.place(relx=1, rely=.4, height = 30, anchor ='ne')
-            self.SetTempMinusButton.place(relx=0, rely=.4, height = 30, anchor ='nw')
+            self.serveButton.grid(row=2, columnspan=4, sticky="nsew", padx=2,pady=2)
+            self.offButton.grid(row=3, columnspan=4, sticky="nsew", padx=2,pady=2)
 
     def updateTemp(self):
         self.temp = read_temp(self.tempAddress)
         #self.temp = randint(50,80)
         #print(self.name + "updated temp")
+        return self.temp
 
     def colorConfigure(self, state):
             self.theme = state
@@ -260,41 +267,47 @@ class Fermentation(threading.Thread):
 
         if self.mode == "ON":
             if self.temp > self.setTemp + .5:
-                self.valveState = True
-                relayOn(self.valveBoard, self.valveChannel)
+                if self.valveState is False:
+                    self.valveState = True
+                    relayOn(self.valveBoard, self.valveChannel)
                 #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                 self.colorConfigure("danger")
                 self.tempFlag = True
 
             elif self.temp > (self.setTemp-self.hys) and self.tempFlag:
-                self.valveState = True
-                relayOn(self.valveBoard, self.valveChannel)
+                if self.valveState is False:
+                    self.valveState = True
+                    relayOn(self.valveBoard, self.valveChannel)
                 #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                 self.colorConfigure("primary")
 
             elif self.temp <= (self.setTemp -self.hys):
-                self.valveState = False
-                relayOff(self.valveBoard, self.valveChannel)
+                if self.valveState is True:
+                    self.valveState = False
+                    relayOff(self.valveBoard, self.valveChannel)
                 #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                 self.colorConfigure("success")
                 self.tempFlag = False
 
             elif self.temp > (self.setTemp- self.hys) and self.tempFlag == False:
-                self.valveState = False
-                relayOff(self.valveBoard, self.valveChannel)
+                if self.valveState is True:
+                    self.valveState = False
+                    relayOff(self.valveBoard, self.valveChannel)
                 #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                 self.colorConfigure("success")
 
             else:
-                self.valveState = False
-                relayOff(self.valveBoard, self.valveChannel)
+                if self.valveState is True:
+                    self.valveState = False
+                    relayOff(self.valveBoard, self.valveChannel)
                 #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                 self.colorConfigure("success")
 
 
         elif self.mode == "OFF":
-            self.valveState = False
-            relayOff(self.valveBoard, self.valveChannel)
+            if self.valveState is True:
+                self.valveState = False
+                relayOff(self.valveBoard, self.valveChannel)
             #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
             self.colorConfigure("secondary")
 
