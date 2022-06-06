@@ -151,6 +151,25 @@ limiter = 0
 alertCounter = 10
 alertSent = False
 
+def alarmReset():
+    global alertCounter, alertSent
+    alertSent = False
+    alertCounter = 0
+    alarmButton.configure(bootstyle = "success")
+    alarmButton['text']="Temp Alarm"
+    print("Temperate Alarm Reset")
+
+alarmButton = ttk.Button(
+                        frame4,
+                        text = "Temp Alarm",
+                        command= alarmReset,
+                        bootstyle="success"
+                        )
+alarmButton.grid(sticky='nsew', row=1, column = 0, columnspan=2,pady=1,padx=1)
+
+
+
+
 def update():
     global limiter, alertCounter, alertSent
 
@@ -198,6 +217,9 @@ def update():
     if alertCounter > 30 and not alertSent:
         sendNotification(" Temperature Not Working Properly " + str(datetime.now().strftime('%Y-%m-%d %H:%M:%S \n')))
         alertSent = True
+        alarmButton.configure(bootstyle = "danger")
+        alarmButton['text']="Clear Temp Alarm"
+        print("alert message was sent")
 
     print("alert " + str(alertCounter))
     root.after(10000,update)

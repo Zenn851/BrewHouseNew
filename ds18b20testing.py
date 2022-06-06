@@ -4,6 +4,7 @@ import csv
 import os
 import time
 from random import randint
+from datetime import datetime
 
 sensors = ["28-0721705c2caa", "28-0207924579fa"]  #define all sensor addresses here
 sensors_map = { sensors[0]: "FV1  = ",
@@ -23,10 +24,11 @@ def read_temp(id):
       temp = round(temp, 1)
       temp_f = temp_c * 9.0 / 5.0 + 32.0
   except Exception:
-      print("sensors "+ id + " not working")
+      print("sensors "+ id + " not working: " + str(datetime.now().strftime('%Y-%m-%d %H:%M:%S \n')))
       pass
 
   return temp
+
 
 if __name__ == '__main__':
     temps = {}
