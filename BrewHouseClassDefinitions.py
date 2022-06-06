@@ -327,10 +327,10 @@ class Fermentation(threading.Thread):
         print("Hysteresis Set Point: "+str(self.hys))
 
         #Below code delays 10 seconds before reading the temp value
-        sleep(5)
+        sleep(10)
 
         while self.running:
-            sleep(.5)
+            sleep(1)
             self.tankTempControl()
 
 

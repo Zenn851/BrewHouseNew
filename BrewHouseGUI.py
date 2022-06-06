@@ -200,7 +200,7 @@ def update():
         alertSent = True
 
     print("alert " + str(alertCounter))
-    root.after(5000,update)
+    root.after(10000,update)
 update()
 # ########################################################
 
