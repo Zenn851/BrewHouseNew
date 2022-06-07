@@ -19,7 +19,7 @@ except:
         print("valveON")
     def relayOff(x,y):
         xxx=1
-        print("valveOFF")
+        #print("valveOFF")
 
 ##############################
 ##############################
@@ -229,8 +229,8 @@ class Fermentation(threading.Thread):
 
             self.offButton.grid(row=3, columnspan=4, sticky="nsew", padx=2,pady=2)
             ###########DEBUG TEMP BUTTONS######################
-            # self.SetTempPlusButton2.grid(row=0,column=3, sticky="ew", padx=2,pady=2)
-            # self.SetTempMinusButton2.grid(row=0,column=0, sticky="ew", padx=2,pady=2)
+            #self.SetTempPlusButton2.grid(row=0,column=3, sticky="ew", padx=2,pady=2)
+            #self.SetTempMinusButton2.grid(row=0,column=0, sticky="ew", padx=2,pady=2)
         else:
             self.tempLabel.grid(row=0,column=1,columnspan=2, sticky="n", padx=2,pady=2)
 
@@ -267,47 +267,41 @@ class Fermentation(threading.Thread):
 
         if self.mode == "ON":
             if self.temp > self.setTemp + .5:
-                if self.valveState is False:
-                    self.valveState = True
-                    relayOn(self.valveBoard, self.valveChannel)
+                self.valveState = True
+                relayOn(self.valveBoard, self.valveChannel)
                 #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                 self.colorConfigure("danger")
                 self.tempFlag = True
 
             elif self.temp > (self.setTemp-self.hys) and self.tempFlag:
-                if self.valveState is False:
-                    self.valveState = True
-                    relayOn(self.valveBoard, self.valveChannel)
+                self.valveState = True
+                relayOn(self.valveBoard, self.valveChannel)
                 #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                 self.colorConfigure("primary")
 
             elif self.temp <= (self.setTemp -self.hys):
-                if self.valveState is True:
-                    self.valveState = False
-                    relayOff(self.valveBoard, self.valveChannel)
+                self.valveState = False
+                relayOff(self.valveBoard, self.valveChannel)
                 #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                 self.colorConfigure("success")
                 self.tempFlag = False
 
             elif self.temp > (self.setTemp- self.hys) and self.tempFlag == False:
-                if self.valveState is True:
-                    self.valveState = False
-                    relayOff(self.valveBoard, self.valveChannel)
+                self.valveState = False
+                relayOff(self.valveBoard, self.valveChannel)
                 #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                 self.colorConfigure("success")
 
             else:
-                if self.valveState is True:
-                    self.valveState = False
-                    relayOff(self.valveBoard, self.valveChannel)
+                self.valveState = False
+                relayOff(self.valveBoard, self.valveChannel)
                 #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
                 self.colorConfigure("success")
 
 
         elif self.mode == "OFF":
-            if self.valveState is True:
-                self.valveState = False
-                relayOff(self.valveBoard, self.valveChannel)
+            self.valveState = False
+            relayOff(self.valveBoard, self.valveChannel)
             #tprint(str(self.name) + "   Mode: " + str(self.mode) + "  Value Status = " + str(self.valveState))
             self.colorConfigure("secondary")
 

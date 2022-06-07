@@ -90,6 +90,7 @@ def tankCreator(df):
             globals()[index].labelFrame.grid(row=grid[index1][0]-1, column=grid[index1][1],sticky='nsew',pady=2,padx=2)
             index1+=1
         tanks.append(index)
+        sleep(.1)
     return tanks
 tanks = tankCreator(tankInfo)
 print(tanks)
@@ -222,7 +223,7 @@ def update():
         print("alert message was sent")
 
     print("alert " + str(alertCounter))
-    root.after(10000,update)
+    root.after(5000,update)
 update()
 # ########################################################
 
