@@ -16,7 +16,7 @@ except:
     print("Relay libarry not loaded")
     def relayOn(x,y):
         xxx=0
-        print("valveON")
+        #print("valveON")
     def relayOff(x,y):
         xxx=1
         #print("valveOFF")
@@ -261,7 +261,7 @@ class Fermentation(threading.Thread):
 
     #Created a function for the main loop
     def tankTempControl(self):
-        #self.temp = read_temp(self.tempAddress)
+        self.temp = read_temp(self.tempAddress)
         self.tempLabel['text']= str(self.temp) + u"\N{DEGREE SIGN}"
         self.setTempLabel['text']= text = "SET TEMP:   " + str(self.setTemp) + u"\N{DEGREE SIGN}"
 

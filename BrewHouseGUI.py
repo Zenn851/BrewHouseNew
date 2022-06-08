@@ -149,7 +149,7 @@ print("first"+ str(threadsOpen))
 ################################################
 ####   MAIN LOOP  ##############################
 limiter = 0
-alertCounter = 10
+alertCounter = 0
 alertSent = False
 
 def alarmReset():
@@ -202,20 +202,19 @@ def update():
     else:
         watch = len(tanks)
         for i in tanks:
-            x = globals()[i].updateTemp()
-            sleep(.1)
+            x = globals()[i].temp
             if x == 0.0:
                 alertCounter += 1
             else:
                 watch-=1
-                print(watch)
+                #print(watch)
                 if watch == 0:
                     alertCounter = 0
         limiter = 0
     ###################################################
     ############Thread Fault Detection##################
     ###################################################
-    if alertCounter > 30 and not alertSent:
+    if alertCounter > 10 and not alertSent:
         sendNotification(" Temperature Not Working Properly " + str(datetime.now().strftime('%Y-%m-%d %H:%M:%S \n')))
         alertSent = True
         alarmButton.configure(bootstyle = "danger")
