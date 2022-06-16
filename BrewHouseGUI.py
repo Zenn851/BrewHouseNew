@@ -10,7 +10,8 @@ import threading
 from time import sleep as sleep
 from push import sendNotification
 from datetime import datetime
-#import thingsIO as th
+import thingsIO as tb
+import json
 
 ####read in the tank info
 try:
@@ -124,7 +125,7 @@ clearButton.grid(sticky='nsew', column = 3, columnspan=2,pady=1,padx=1)
 #                         command= killThread,
 #                         bootstyle="secondary"
 #                         )
-# killButton.grid(sticky='n', columnspan=2)
+#killButton.grid(row=6)
 ############################################
 #############################################
 
@@ -148,10 +149,15 @@ print("first"+ str(threadsOpen))
 
 ################################################
 ####   MAIN LOOP  ##############################
-limiter = 0
+###############################################
+#Temperature Alerts Varibales
 alertCounter = 0
 alertSent = False
 
+#Import ThingsBoard Object
+thingsIO = tb.ThingsBoardData()
+
+#Reset A Temperature Alert
 def alarmReset():
     global alertCounter, alertSent
     alertSent = False
@@ -169,12 +175,8 @@ alarmButton = ttk.Button(
 alarmButton.grid(sticky='nsew', row=1, column = 0, columnspan=2,pady=1,padx=1)
 
 
-
-
 def update():
     global limiter, alertCounter, alertSent
-
-
     ###################################################
     ############Thread Fault Detection##################
     ###################################################
@@ -182,7 +184,6 @@ def update():
     currentThreads = []
     for thread in threading.enumerate():
         currentThreads.append(thread.name+"debug")
-
 
     #check the current theads against the threads that were open
     for i in threadsOpen:
@@ -195,22 +196,32 @@ def update():
             sendNotification(i + " thread is no longer running " + str(datetime.now().strftime('%Y-%m-%d %H:%M:%S \n')))
 
 
-    #print("loopp"+ str(threadsOpen))
-    if limiter <1:
-        limiter+=1
-        pass
-    else:
-        watch = len(tanks)
-        for i in tanks:
-            x = globals()[i].temp
-            if x == 0.0:
-                alertCounter += 1
-            else:
-                watch-=1
-                #print(watch)
-                if watch == 0:
-                    alertCounter = 0
-        limiter = 0
+    #Mainloop to look for thread and temperature Alerts
+    watch = len(tanks)
+    data_out = {}
+    for i in tanks:
+        #Adding Info to Send to ThingsBoard
+        x = globals()[i].temp
+        y = globals()[i].name
+        z = globals()[i].setTemp
+        a = globals()[i].valveState
+        data_out[y+" Tempurature"] = x
+        data_out[y+" SetTemp"] = z
+        data_out[y+" valveOpen"] = a
+
+        if x == 0.0:
+            alertCounter += 1
+        else:
+            watch-=1
+            #print(watch)
+            if watch == 0:
+                alertCounter = 0
+
+    #Send Data to ThingsBoard
+    data_out1 = json.dumps(data_out)
+    thingsIO.thingsConnect()
+    thingsIO.thingsData(data_out1)
+
     ###################################################
     ############Thread Fault Detection##################
     ###################################################
@@ -223,7 +234,9 @@ def update():
 
     print("alert " + str(alertCounter))
     root.after(5000,update)
-update()
-# ########################################################
 
+#########################################################
+##########################################################
+
+update()
 root.mainloop()

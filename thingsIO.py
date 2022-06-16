@@ -2,20 +2,19 @@ import time
 import paho.mqtt.client as mqtt
 import json
 from random import randint
+import pandas as pd
 
 
 class ThingsBoardData():
     def __init__(
                 self,
-                name,
-                #iot_hub="thingsboard.cloud",
                 iot_hub="demo.thingsboard.io",
-                username= "7DUh4Kb6IbFgndXKpER3",
+                username= "uvrGfmOoDWd4b7aEvOzn",
                 password="",
                 topic="v1/devices/me/telemetry",
                 port = 1883):
 
-        self.name = name
+        #self.name = name
         self.iot_hub = iot_hub
         self.username = username
         self.password = password
@@ -25,23 +24,23 @@ class ThingsBoardData():
         self.client.username_pw_set(self.username,self.password)
 
     def thingsConnect(self):
-        self.client.connect(self.iot_hub,self.port)
+        try:
+            self.client.connect(self.iot_hub,self.port)
+        except Exception:
+            print("connection failed")
 
+    def thingsData(self,data_out):
+        try:
+            self.client.publish(self.topic,data_out,0)
 
-    def thingsData(self,temp,setTemp,status):
-        data=dict()
-        data[self.name+" Temp"]= temp
-        data[self.name+" Set Temp"]= setTemp
-        #data[self.name+ " Status"] = status
-        data_out = json.dumps(data)
-        self.client.publish(self.topic,data_out,0)
-        print(data_out)
+        except Exception:
+            print("publish failed")
+
+        #print(data_out)
 
     def thingsDisconnect(self):
         self.client.disconnect()
 
-    def testName(self):
-        print(self.name)
 
 
 if __name__ == '__main__':
