@@ -3,14 +3,16 @@
 import csv
 import os
 import time
+from random import randint
+from datetime import datetime
 
-sensors = ["28-0721705c2caa", "28-0207924579fa"]  #define all sensor addresses here
-sensors_map = { sensors[0]: "FV1  = ",
-                sensors[1]: "FV2 = "}
+# sensors = ["28-0721705c2caa", "28-0207924579fa"]  #define all sensor addresses here
+# sensors_map = { sensors[0]: "FV1  = ",
+#                 sensors[1]: "FV2 = "}
 
 def read_temp(id):
   sensor = "/sys/devices/w1_bus_master1/" + id + "/w1_slave"
-  temp = 125.0 # error value
+  temp = 0.0 # error value
   try:
     f = open(sensor, "r")
     data = f.read()
@@ -20,12 +22,14 @@ def read_temp(id):
       temp = float(partitioned[2]) / 1000.0
       temp = temp * 9.0 / 5.0 + 32.0
       temp = round(temp, 1)
-      temp_f = temp_c * 9.0 / 5.0 + 32.0
+      #temp_f = temp_c * 9.0 / 5.0 + 32.0
   except Exception:
-      #temp = 2000
+      print("sensors "+ id + " not working: " + str(datetime.now().strftime('%Y-%m-%d %H:%M:%S \n')))
+      #temp= randint(60,100)
       pass
 
   return temp
+
 
 if __name__ == '__main__':
     temps = {}

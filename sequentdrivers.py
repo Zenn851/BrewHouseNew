@@ -183,15 +183,21 @@ def testRelayBoard():
 
 def relayOn(boardNumber,channelNumber):
     try:
-        RELAYS.set(boardNumber,channelNumber,1)
+        if boardNumber == 5:
+            pass
+        else:
+            RELAYS.set(boardNumber,channelNumber,1)
     except:
-        print("Relay Not Working")
+        print("Relay ON Not Working, BoardNumber,channelNumber: " + str(boardNumber)+", " +  str(channelNumber))
 
 def relayOff(boardNumber,channelNumber):
     try:
-        RELAYS.set(boardNumber,channelNumber,0)
+        if boardNumber == 5:
+            pass
+        else:
+            RELAYS.set(boardNumber,channelNumber,0)
     except:
-        print("Relay Not Working")
+        print("Relay OFF Not Working, BoardNumber,channelNumber: " + str(boardNumber)+", " + str(channelNumber))
 
 
 
